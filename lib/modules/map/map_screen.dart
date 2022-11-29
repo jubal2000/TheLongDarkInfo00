@@ -48,10 +48,13 @@ class MapScreen extends GetView<MapScreenController> {
                       },
                       child: showImageFit(STR(controller.targetInfo['map_full'])),
                     ),
-                    ...controller.getPinListWidget(),
+                    ...controller.getPinListWidget(context, (detail) {
+                      setState(() {
+
+                      });
+                    }),
                   ],
                 ),
-              ),
               // children: [
                 // PhotoView(
                 //   controller: controller.photoViewController,
@@ -73,17 +76,17 @@ class MapScreen extends GetView<MapScreenController> {
                 //   },
                 // ),
               // ]
+            )
             ),
             floatingActionButton: FabCircularMenu(
-              alignment: Alignment(1,1.02),
               fabOpenIcon: Icon(Icons.menu, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
               fabCloseIcon: Icon(Icons.close, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
               fabMargin: EdgeInsets.all(15),
               fabSize: 55,
               fabColor: Theme.of(context).primaryColor,
-              ringColor: Theme.of(context).primaryColor.withOpacity(0.25),
-              ringDiameter: 300,
-              ringWidth: 80,
+              ringColor: Theme.of(context).primaryColor.withOpacity(0.2),
+              ringDiameter: 280,
+              ringWidth: 60,
               children: <Widget>[
                 mainMenu(Icons.share, 'LINK', () {
                 }, Theme.of(context).colorScheme.secondaryContainer),
@@ -93,13 +96,19 @@ class MapScreen extends GetView<MapScreenController> {
                 //     // controller.photoViewController.reset();
                 //   });
                 // }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(Icons.place_outlined, 'PIN CLEAR', () {
+                mainMenu(Icons.star_border, 'OBJECT', () {
                   setState(() {
                     AppData.isRotateLock = !AppData.isRotateLock;
                     // controller.photoViewController.reset();
                   });
                 }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(AppData.isPinShow ? Icons.visibility_outlined : Icons.visibility_off_outlined, AppData.isPinShow ? 'PIN SHOW' : 'PIN HIDE', () {
+                mainMenu(Icons.cleaning_services_outlined, 'CLEAR', () {
+                  setState(() {
+                    AppData.isRotateLock = !AppData.isRotateLock;
+                    // controller.photoViewController.reset();
+                  });
+                }, Theme.of(context).colorScheme.secondaryContainer),
+                mainMenu(AppData.isPinShow ? Icons.visibility_outlined : Icons.visibility_off_outlined, AppData.isPinShow ? 'SHOW' : 'HIDE', () {
                   setState(() {
                     AppData.isPinShow = !AppData.isPinShow;
                     // controller.photoViewController.reset();
@@ -116,8 +125,8 @@ class MapScreen extends GetView<MapScreenController> {
   Widget mainMenu(icon, title, onTap, [backColor = Colors.transparent]) {
     return GestureDetector(
         child: Container(
-            width: controller.iconSize * 2,
-            height: controller.iconSize * 2,
+            width: 50,
+            height: 50,
             decoration: BoxDecoration(
               color: backColor,
               borderRadius: BorderRadius.all(Radius.circular(60)),

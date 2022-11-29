@@ -454,6 +454,7 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
                         showColorSelectorDialog(context, 'COLOR SELECT', COL(jsonData['color'])).then((result) {
@@ -481,7 +482,7 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                         ,
                       ),
                     ),
-                    SizedBox(height: 5),
+                    SizedBox(height: 10),
                     TextFormField(
                       controller: titleController,
                       decoration: inputLabel(context, 'Title'.tr, ''),
@@ -495,7 +496,7 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                         });
                       },
                     ),
-                    SizedBox(height: 5),
+                    SizedBox(height: 10),
                     TextFormField(
                       controller: editController,
                       decoration: inputLabel(context, 'Description'.tr, ''),
@@ -522,27 +523,23 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                 TextButton(
                   child: Text('OK'.tr),
                   onPressed: () {
-                    showAlertYesNoDialog(context, 'Upload'.tr, 'Would you like to write a pin data?'.tr,
-                        '', 'Cancel'.tr, 'OK'.tr).then((value) {
-                      if (value == 0) return;
-                      showLoadingDialog(context, 'writing now...'.tr);
+                    showLoadingDialog(context, 'writing now...'.tr);
+                    Future.delayed(Duration(milliseconds: 200), () async {
+                      AppData.pinData[targetId]['data'].add(jsonData);
+                      await local.writeLocalData('pinData', AppData.pinData);
+                      Navigator.of(dialogContext!).pop();
                       Future.delayed(Duration(milliseconds: 200), () async {
-                        AppData.pinData[targetId]['data'].add(jsonData);
-                        await local.writeLocalData('pinData', AppData.pinData);
-                        Navigator.of(dialogContext!).pop();
-                        Future.delayed(Duration(milliseconds: 200), () async {
-                          Navigator.pop(dlgContext, jsonData);
-                        });
-                        // JSON upResult = await api.addPinData(jsonData);
-                        // if (upResult['error'] == null) {
-                        //   var resultData = FROM_SERVER_DATA(jsonData);
-                        //   upResult = {'status': 'success', 'result': resultData};
-                        // }
-                        // Navigator.of(dialogContext!).pop();
-                        // Future.delayed(Duration(milliseconds: 200), () async {
-                        //   Navigator.pop(dlgContext, upResult);
-                        // });
+                        Navigator.pop(dlgContext, jsonData);
                       });
+                      // JSON upResult = await api.addPinData(jsonData);
+                      // if (upResult['error'] == null) {
+                      //   var resultData = FROM_SERVER_DATA(jsonData);
+                      //   upResult = {'status': 'success', 'result': resultData};
+                      // }
+                      // Navigator.of(dialogContext!).pop();
+                      // Future.delayed(Duration(milliseconds: 200), () async {
+                      //   Navigator.pop(dlgContext, upResult);
+                      // });
                     });
                   }
                 )
