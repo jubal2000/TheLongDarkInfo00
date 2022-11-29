@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tphoto_view/photo_view.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/app_data.dart';
@@ -11,9 +13,10 @@ import '../../service/api_service.dart';
 
 class MapScreenController extends GetxController {
   final api = Get.find<ApiService>();
+  final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
+  final PhotoViewController photoViewController = PhotoViewController();
   final offset = 20.0;
   final iconSize = 30.0;
-  final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
 
   JSON targetInfo = {};
   String targetId = '';
@@ -26,7 +29,7 @@ class MapScreenController extends GetxController {
     super.onInit();
   }
 
-  onImageTap(context, detail, value) {
+  onImageTap(context, detail) async {
     final dx = detail.localPosition.dx;
     final dy = detail.localPosition.dy;
     LOG('--> onTapUp : $dx, $dy');
@@ -42,16 +45,30 @@ class MapScreenController extends GetxController {
       'title': '',
       'desc': '',
     };
-    showPinEditDialog(context, targetId, pinData).then((result) {
-      LOG('--> pin result : $result');
-    });
-    LOG('--> ${AppData.pinData[targetId]['data']}');
+    var result = await showPinEditDialog(context, targetId, pinData);
+    LOG('--> result : $result');
+  }
+
+  List<Widget> getPinListWidget() {
+    List<Widget> result = [];
+    for (var item in AppData.pinData[targetId]['data']) {
+      result.add(
+        Positioned(
+          left: DBL(item['dx']),
+          top: DBL(item['dy']),
+          child: Container(
+            child: Icon(Icons.place),
+          )
+        )
+      );
+    }
+    return result;
   }
 
   searchPinPoint(double x, double y) {
     for (var item in AppData.pinData[targetId]['data']) {
       if (item.dx - offset <= x && item.dx + offset >= x &&
-          item.dx - offset <= x && item.dx + offset >= x) {
+          item.dy - offset <= y && item.dy + offset >= y) {
         LOG('--> find point [$x, $y] : $item');
         return item;
       }

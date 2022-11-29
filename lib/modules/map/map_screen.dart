@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
+import 'package:gesture_zoom_box/gesture_zoom_box.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:helpers/helpers/widgets/align.dart';
@@ -7,6 +8,7 @@ import 'package:the_long_dark_info/service/api_service.dart';
 import 'package:the_long_dark_info/service/firebase_service.dart';
 import 'package:tphoto_view/photo_view.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 import '../../core/app_data.dart';
 import '../../core/common_sizes.dart';
@@ -22,71 +24,84 @@ class MapScreen extends GetView<MapScreenController> {
   Widget build(BuildContext context) {
     return StatefulBuilder(
       builder: (context, setState) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(STR(controller.targetInfo['title_kr'])),
-            titleSpacing: 0,
-            toolbarHeight: top_height,
-          ),
-          body: Container(
-            child: Stack(
-              children: [
-                PhotoView(
-                  imageProvider: NetworkImage(STR(controller.targetInfo['map_full'])),
-                  enableRotation: !AppData.isRotateLock,
-                  backgroundDecoration: BoxDecoration(
-                    color: Colors.white
-                  ),
-                  onTapUp: controller.onImageTap,
+        return SafeArea(
+          top: false,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(STR(controller.targetInfo['title_kr'])),
+              titleSpacing: 0,
+              toolbarHeight: top_height,
+            ),
+            body: GestureZoomBox(
+              maxScale: 5.0,
+              duration: Duration(milliseconds: 100),
+              child: Center(
+                child: Stack(
+                  children: [
+                    GestureDetector(
+                      onTapUp: (detail) {
+                        LOG('--> detail : ${detail.localPosition}');
+                        controller.onImageTap(context, detail).then((result) {
+                          setState(() {
+                          });
+                        });
+                      },
+                      child: showImageFit(STR(controller.targetInfo['map_full'])),
+                    ),
+                    ...controller.getPinListWidget(),
+                  ],
                 ),
-                // BottomLeftAlign(
-                //   child: FloatingActionButton(
-                //     onPressed: () {
-                //
-                //     },
-                //     child: Icon(controller.isRotateLock ? Icons.lock : Icons.lock_open),
-                //   ),
-                // )
-                // ImageZoomOnMove(
-                //   width: MediaQuery.of(context).size.width,
-                //   height: MediaQuery.of(context).size.height,
-                //   image: Image.network(STR(controller.targetInfo['map_full'])),
-                //   onTap: () {
-                //
-                //   },
-                // )
-              ],
-            )
-          ),
-          floatingActionButton: FabCircularMenu(
-            key: controller.fabKey,
-            alignment: Alignment(1,1.02),
-            fabOpenIcon: Icon(Icons.menu, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
-            fabCloseIcon: Icon(Icons.close, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
-            fabMargin: EdgeInsets.all(15),
-            fabSize: 55,
-            fabColor: Theme.of(context).primaryColor,
-            ringColor: Theme.of(context).primaryColor.withOpacity(0.25),
-            ringDiameter: 300,
-            ringWidth: 80,
-            children: <Widget>[
-              mainMenu(Icons.share, '공유', () {
-              }, Theme.of(context).colorScheme.secondaryContainer),
-              mainMenu(AppData.isRotateLock ? Icons.lock : Icons.lock_open, '회전', () {
-                setState(() {
-                  AppData.isRotateLock = !AppData.isRotateLock;
-                });
-              }, Theme.of(context).colorScheme.secondaryContainer),
-              Container(
-                width: controller.iconSize * 2,
-                height: controller.iconSize * 2,
               ),
-              // Container(),
-              // mainMenu(Icons.notifications_active, 'TEST', () async {
-              //   await webViewController!.evaluateJavascript(source: 'window.flutter_inappwebview.callHandler("getUserData","test ok");');
-              // }, Theme.of(context).colorScheme.secondaryContainer),
-            ]
-          ),
+              // children: [
+                // PhotoView(
+                //   controller: controller.photoViewController,
+                //   imageProvider: NetworkImage(STR(controller.targetInfo['map_full'])),
+                //   enableRotation: !AppData.isRotateLock,
+                //   backgroundDecoration: BoxDecoration(
+                //     color: Colors.white
+                //   ),
+                //   onTapUp: (context, detail, value) {
+                //     controller.onImageTap(context, detail, value).then((result) {
+                //       setState(() {
+                //       });
+                //     });
+                //   },
+                //   onScaleEnd: (context, detail, value) {
+                //     setState(() {
+                //
+                //     });
+                //   },
+                // ),
+              // ]
+            ),
+            floatingActionButton: FabCircularMenu(
+              alignment: Alignment(1,1.02),
+              fabOpenIcon: Icon(Icons.menu, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
+              fabCloseIcon: Icon(Icons.close, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
+              fabMargin: EdgeInsets.all(15),
+              fabSize: 55,
+              fabColor: Theme.of(context).primaryColor,
+              ringColor: Theme.of(context).primaryColor.withOpacity(0.25),
+              ringDiameter: 300,
+              ringWidth: 80,
+              children: <Widget>[
+                mainMenu(Icons.share, 'LINK', () {
+                }, Theme.of(context).colorScheme.secondaryContainer),
+                mainMenu(AppData.isRotateLock ? Icons.screen_lock_rotation : Icons.screen_rotation, AppData.isRotateLock ? 'LOCK' : 'UNLOCK', () {
+                  setState(() {
+                    AppData.isRotateLock = !AppData.isRotateLock;
+                    // controller.photoViewController.reset();
+                  });
+                }, Theme.of(context).colorScheme.secondaryContainer),
+                mainMenu(AppData.isShowPlace ? Icons.place_outlined : Icons.clear, AppData.isShowPlace ? 'PIN SHOW' : 'PIN HIDE', () {
+                  setState(() {
+                    AppData.isShowPlace = !AppData.isShowPlace;
+                    // controller.photoViewController.reset();
+                  });
+                }, Theme.of(context).colorScheme.secondaryContainer),
+              ]
+            ),
+          )
         );
       }
     );
@@ -106,7 +121,7 @@ class MapScreen extends GetView<MapScreenController> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(icon, color: Colors.white),
-                  SizedBox(width: 5),
+                  SizedBox(height: 2),
                   Text(title, style: menuItemTitleStyle)
                 ]
             )
