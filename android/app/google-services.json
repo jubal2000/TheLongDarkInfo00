@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "786709934544",
+    "project_id": "thelongdarkinfo00",
+    "storage_bucket": "thelongdarkinfo00.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:786709934544:android:d3098cd26efe5344eb89d5",
+        "android_client_info": {
+          "package_name": "com.jhfactory.tld_info_00"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "786709934544-vhmpnkohj3utsfk93ibqlcblopakoj96.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJf1tyznBdHw1cVzCY0WOc5FeuiswL0cM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "786709934544-vhmpnkohj3utsfk93ibqlcblopakoj96.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
