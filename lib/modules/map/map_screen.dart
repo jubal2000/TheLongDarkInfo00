@@ -33,7 +33,7 @@ class MapScreen extends GetView<MapScreenController> {
               toolbarHeight: top_height,
             ),
             body: GestureZoomBox(
-              maxScale: 5.0,
+              maxScale: 10.0,
               duration: Duration(milliseconds: 100),
               child: Center(
                 child: Stack(
@@ -87,15 +87,21 @@ class MapScreen extends GetView<MapScreenController> {
               children: <Widget>[
                 mainMenu(Icons.share, 'LINK', () {
                 }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(AppData.isRotateLock ? Icons.screen_lock_rotation : Icons.screen_rotation, AppData.isRotateLock ? 'LOCK' : 'UNLOCK', () {
+                // mainMenu(AppData.isRotateLock ? Icons.screen_lock_rotation : Icons.screen_rotation, AppData.isRotateLock ? 'LOCK' : 'UNLOCK', () {
+                //   setState(() {
+                //     AppData.isRotateLock = !AppData.isRotateLock;
+                //     // controller.photoViewController.reset();
+                //   });
+                // }, Theme.of(context).colorScheme.secondaryContainer),
+                mainMenu(Icons.place_outlined, 'PIN CLEAR', () {
                   setState(() {
                     AppData.isRotateLock = !AppData.isRotateLock;
                     // controller.photoViewController.reset();
                   });
                 }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(AppData.isShowPlace ? Icons.place_outlined : Icons.clear, AppData.isShowPlace ? 'PIN SHOW' : 'PIN HIDE', () {
+                mainMenu(AppData.isPinShow ? Icons.visibility_outlined : Icons.visibility_off_outlined, AppData.isPinShow ? 'PIN SHOW' : 'PIN HIDE', () {
                   setState(() {
-                    AppData.isShowPlace = !AppData.isShowPlace;
+                    AppData.isPinShow = !AppData.isPinShow;
                     // controller.photoViewController.reset();
                   });
                 }, Theme.of(context).colorScheme.secondaryContainer),

@@ -12,5 +12,5 @@ class AppData {
   static JSON listSelectData = {};
 
   static bool isRotateLock = false;
-  static bool isShowPlace = true;
+  static bool isPinShow = true;
 }

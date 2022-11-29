@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -426,103 +427,131 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
   initData();
 
   return await showDialog(
-      context: context,
-      builder: (BuildContext dlgContext) {
-        return PointerInterceptor(
-          child: StatefulBuilder(
-              builder: (context, setState) {
-                return AlertDialog(
-                  scrollable: true,
-                  title: Row(
-                    children: [
-                      Icon(Icons.place_outlined, size: 24),
-                      SizedBox(width: 5),
-                      Text('Pin edit'.tr, style: dialogTitleTextStyle)
-                    ],
-                  ),
-                  // titleTextStyle: type == CommentType.message ? _titleText2 : _titleText,
-                  insetPadding: EdgeInsets.all(15),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                  // backgroundColor: Colors.white,
-                  backgroundColor: dialogBgColor,
-                  content: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width,
+    context: context,
+    builder: (BuildContext dlgContext) {
+      return PointerInterceptor(
+        child: StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              scrollable: true,
+              title: Row(
+                children: [
+                  Icon(Icons.place_outlined, size: 24),
+                  SizedBox(width: 5),
+                  Text('Pin edit'.tr, style: dialogTitleTextStyle)
+                ],
+              ),
+              // titleTextStyle: type == CommentType.message ? _titleText2 : _titleText,
+              insetPadding: EdgeInsets.all(15),
+              contentPadding: EdgeInsets.symmetric(horizontal: 10),
+              // backgroundColor: Colors.white,
+              backgroundColor: dialogBgColor,
+              content: Container(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        showColorSelectorDialog(context, 'COLOR SELECT', COL(jsonData['color'])).then((result) {
+                          setState(() {
+                            jsonData['color'] = COL2STR(result);
+                            LOG('--> showColorSelectorDialog result : ${result.toString()} -> ${jsonData['color']}');
+                          });
+                        });
+                      },
+                      child: Container(
+                        width: 80,
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: COL(jsonData['color']),
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          border: Border.all(
+                            color: Theme.of(context).primaryColor,
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text('COLOR SELECT', style: itemDescStyle, textAlign: TextAlign.center),
+                        )
+                        ,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextFormField(
-                            controller: titleController,
-                            decoration: inputLabel(context, 'Title'.tr, ''),
-                            keyboardType: TextInputType.multiline,
-                            maxLines: 1,
-                            // style: _editText,
-                            onChanged: (value) {
-                              setState(() {
-                                jsonData['title'] = value;
-                                isChanged = true;
-                              });
-                            },
-                          ),
-                          SizedBox(height: 5),
-                          TextFormField(
-                            controller: editController,
-                            decoration: inputLabel(context, 'Description'.tr, ''),
-                            keyboardType: TextInputType.multiline,
-                            maxLines: null,
-                            // style: _editText,
-                            onChanged: (value) {
-                              setState(() {
-                                jsonData['desc'] = value;
-                                isChanged = true;
-                              });
-                            },
-                          ),
-                        ],
-                      )
-                  ),
-                  actions: [
-                    TextButton(
-                      child: Text('Cancel'.tr),
-                      onPressed: () {
-                        Navigator.pop(dlgContext, {});
+                    ),
+                    SizedBox(height: 5),
+                    TextFormField(
+                      controller: titleController,
+                      decoration: inputLabel(context, 'Title'.tr, ''),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 1,
+                      // style: _editText,
+                      onChanged: (value) {
+                        setState(() {
+                          jsonData['title'] = value;
+                          isChanged = true;
+                        });
                       },
                     ),
-                    TextButton(
-                        child: Text('OK'.tr),
-                        onPressed: () {
-                          showAlertYesNoDialog(context, 'Upload'.tr, 'Would you like to write a pin data?'.tr,
-                              '', 'Cancel'.tr, 'OK'.tr).then((value) {
-                            if (value == 0) return;
-                            showLoadingDialog(context, 'writing now...'.tr);
-                            Future.delayed(Duration(milliseconds: 200), () async {
-                              AppData.pinData[targetId]['data'].add(jsonData);
-                              await local.writeLocalData('pinData', AppData.pinData);
-                              Navigator.of(dialogContext!).pop();
-                              Future.delayed(Duration(milliseconds: 200), () async {
-                                Navigator.pop(dlgContext, jsonData);
-                              });
-                              // JSON upResult = await api.addPinData(jsonData);
-                              // if (upResult['error'] == null) {
-                              //   var resultData = FROM_SERVER_DATA(jsonData);
-                              //   upResult = {'status': 'success', 'result': resultData};
-                              // }
-                              // Navigator.of(dialogContext!).pop();
-                              // Future.delayed(Duration(milliseconds: 200), () async {
-                              //   Navigator.pop(dlgContext, upResult);
-                              // });
-                            });
-                          });
-                        }
-                    )
+                    SizedBox(height: 5),
+                    TextFormField(
+                      controller: editController,
+                      decoration: inputLabel(context, 'Description'.tr, ''),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      // style: _editText,
+                      onChanged: (value) {
+                        setState(() {
+                          jsonData['desc'] = value;
+                          isChanged = true;
+                        });
+                      },
+                    ),
                   ],
-                );
-              }
-          ),
-        );
-      }
+                )
+              ),
+              actions: [
+                TextButton(
+                  child: Text('Cancel'.tr),
+                  onPressed: () {
+                    Navigator.pop(dlgContext, {});
+                  },
+                ),
+                TextButton(
+                  child: Text('OK'.tr),
+                  onPressed: () {
+                    showAlertYesNoDialog(context, 'Upload'.tr, 'Would you like to write a pin data?'.tr,
+                        '', 'Cancel'.tr, 'OK'.tr).then((value) {
+                      if (value == 0) return;
+                      showLoadingDialog(context, 'writing now...'.tr);
+                      Future.delayed(Duration(milliseconds: 200), () async {
+                        AppData.pinData[targetId]['data'].add(jsonData);
+                        await local.writeLocalData('pinData', AppData.pinData);
+                        Navigator.of(dialogContext!).pop();
+                        Future.delayed(Duration(milliseconds: 200), () async {
+                          Navigator.pop(dlgContext, jsonData);
+                        });
+                        // JSON upResult = await api.addPinData(jsonData);
+                        // if (upResult['error'] == null) {
+                        //   var resultData = FROM_SERVER_DATA(jsonData);
+                        //   upResult = {'status': 'success', 'result': resultData};
+                        // }
+                        // Navigator.of(dialogContext!).pop();
+                        // Future.delayed(Duration(milliseconds: 200), () async {
+                        //   Navigator.pop(dlgContext, upResult);
+                        // });
+                      });
+                    });
+                  }
+                )
+              ],
+            );
+          }
+        ),
+      );
+    }
   );
 }
 
@@ -553,3 +582,70 @@ showLoadingDialog(BuildContext context, String message) {
   );
 }
 
+const List<Color> colorSelectLists = [
+  Colors.red,
+  Colors.pink,
+  Colors.purple,
+  Colors.deepPurple,
+  Colors.indigo,
+  Colors.blue,
+  Colors.lightBlue,
+  Colors.cyan,
+  Colors.teal,
+  Colors.green,
+  Colors.lightGreen,
+  Colors.lime,
+  Colors.yellow,
+  Colors.amber,
+  Colors.orange,
+  Colors.deepOrange,
+  Colors.brown,
+  Colors.grey,
+  Colors.blueGrey,
+  Colors.black,
+];
+
+showColorSelectorDialog(BuildContext context, String title, Color selectColor) async {
+  return await showDialog(
+    context: context,
+    barrierColor: Colors.black87,
+    builder: (BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+              children: [
+                ColorPicker(
+                  paletteType: PaletteType.hsl,
+                  pickerColor: selectColor,
+                  colorHistory: colorSelectLists,
+                  onColorChanged: (Color value) {
+                    selectColor = value;
+                  },
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop(selectColor);
+                  },
+                  child: Container(
+                    width: 200,
+                    height: 40,
+                    margin: EdgeInsets.only(top: 10),
+                    alignment: Alignment.center,
+                    child: Text('Select'.tr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).canvasColor,
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                  ),
+                ),
+              ]
+            )
+          )
+        )
+      );
+    }
+  );
+}

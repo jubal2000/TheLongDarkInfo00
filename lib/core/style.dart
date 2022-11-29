@@ -29,3 +29,5 @@ TextStyle itemTitleAlertStyle = TextStyle(
     fontSize: item_title_font_size, color: Colors.redAccent, fontWeight: FontWeight.w700);
 TextStyle itemTitleColorStyle = TextStyle(
     fontSize: item_title_font_size, color: Colors.deepPurple, fontWeight: FontWeight.w700);
+TextStyle itemDescStyle = TextStyle(
+    fontSize: item_desc_font_size, color: Colors.black54, fontWeight: FontWeight.w600);
