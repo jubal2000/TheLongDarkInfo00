@@ -105,11 +105,19 @@ class MapScreen extends GetView<MapScreenController> {
                     }
                   });
                 }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(Icons.star_border, 'OBJECT'.tr, () {
-                  setState(() {
-                    // controller.photoViewController.reset();
-                  });
-                }, Theme.of(context).colorScheme.secondaryContainer),
+                if (AppData.mapData[controller.targetId] != null && LIST_NOT_EMPTY(AppData.mapData[controller.targetId]['insideData']))
+                  mainMenu(Icons.star_border, 'OBJECT'.tr, () {
+                    showLinkSelectDialog(context, controller.targetId, isInside: true).then((itemInfo) {
+                      LOG('--> itemInfo : $itemInfo');
+                      if (itemInfo != null) {
+                        setState(() {
+                          controller.targetInfo = itemInfo;
+                          controller.targetId = itemInfo['id'] ?? 'id_none';
+                        });
+                        // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
+                      }
+                    });
+                  }, Theme.of(context).colorScheme.secondaryContainer),
                 mainMenu(Icons.cleaning_services_outlined, 'CLEAR'.tr, () {
                   controller.clearPinMark(context).then((result) {
                     setState(() {

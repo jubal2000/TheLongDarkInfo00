@@ -8,6 +8,9 @@ import '../core/utils.dart';
 import '../routes.dart';
 
 Widget mainListItem(JSON itemInfo, [Function()? onSelect]) {
+  if (STR(itemInfo['icon']).isEmpty) {
+    itemInfo['icon'] = '107';
+  }
   return GestureDetector(
       onTap: () {
         if (onSelect != null) onSelect();
@@ -17,7 +20,7 @@ Widget mainListItem(JSON itemInfo, [Function()? onSelect]) {
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         margin: EdgeInsets.symmetric(vertical: 2),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: INT(itemInfo['type']) == 1 ? Colors.white60 : Colors.white,
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: Row(
@@ -35,9 +38,9 @@ Widget mainListItem(JSON itemInfo, [Function()? onSelect]) {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(STR(itemInfo['title_kr']), style: itemTitleStyle, maxLines: 2),
+                          Text(STR(itemInfo['titleEx_kr'] ?? itemInfo['title_kr']), style: itemTitleStyle, maxLines: 2),
                           SizedBox(height: 3),
-                          Text(STR(itemInfo['title']).toString().toUpperCase(), style: itemTitleInfoStyle, maxLines: 2),
+                          Text(STR(itemInfo['titleEx'] ?? itemInfo['title']).toUpperCase(), style: itemTitleInfoStyle, maxLines: 2),
                         ]
                     ),
                     Icon(Icons.arrow_forward_ios, size: 24, color: Colors.black12),

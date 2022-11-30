@@ -649,7 +649,7 @@ showColorSelectorDialog(BuildContext context, String title, Color selectColor) a
   );
 }
 
-Future showLinkSelectDialog(BuildContext context, String targetId)
+Future showLinkSelectDialog(BuildContext context, String targetId, {bool isInside = false})
 {
   var api = Get.find<ApiService>();
   return showDialog(
@@ -658,28 +658,32 @@ Future showLinkSelectDialog(BuildContext context, String targetId)
     builder: (BuildContext context) {
       return PointerInterceptor(
         child: AlertDialog(
-          title: Text('Link'.tr, style: dialogTitleTextStyle),
-          titlePadding: EdgeInsets.all(20),
-          insetPadding: EdgeInsets.all(20),
+          title: Text('Link select'.tr, style: dialogTitleTextStyle),
+          contentPadding: EdgeInsets.fromLTRB(10, 20, 10, 0),
+          insetPadding: EdgeInsets.symmetric(horizontal: 10),
           backgroundColor: dialogBgColor,
           content: SingleChildScrollView(
             child: FutureBuilder(
-              future: api.getMapLinkData(),
+              future: isInside ? api.getMapInsideData() : api.getMapLinkData(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Container(
+                  return SizedBox(
                     width: MediaQuery.of(context).size.width * 0.9,
                     child: ListBody(
-                      children: getLinkList(targetId, (itemInfo) {
+                      children: isInside ? getInsideList(targetId, (itemInfo) {
+                        Navigator.of(context).pop(itemInfo);
+                      }) : getLinkList(targetId, (itemInfo) {
                         Navigator.of(context).pop(itemInfo);
                       }),
                     )
                   );
                 } else {
-                  return SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator()
+                  return Center(
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator()
+                    )
                   );
                 }
               }
@@ -702,29 +706,102 @@ Future showLinkSelectDialog(BuildContext context, String targetId)
 List<Widget> getLinkList(String targetId, Function(JSON) onSelect) {
   List<Widget> result = [];
   List<String> checkList = [];
-  for (var item in AppData.mapData.entries) {
-    if (LIST_NOT_EMPTY(item.value['linkData'])) {
-      for (var link in item.value['linkData']) {
-        if (link == targetId && !checkList.contains(item.key)) {
-          checkList.add(item.key);
+  LOG('--> getLinkList : $targetId');
+
+  if (AppData.mapData[targetId] != null) {
+    if (LIST_NOT_EMPTY(AppData.mapData[targetId]['linkData'])) {
+      for (var link in AppData.mapData[targetId]['linkData']) {
+        var item = AppData.mapData[link];
+        if (item != null && !checkList.contains(item['id'])) {
+          LOG('--> add 0 : ${item['title']}');
+          checkList.add(item['id']);
           result.add(
-            mainListItem(item.value, () {
-              onSelect(item.value);
+            mainListItem(item, () {
+              onSelect(item);
             })
           );
         }
       }
     }
   }
+
+  if (AppData.mapLinkData[targetId] != null) {
+    for (var link in AppData.mapLinkData[targetId]['linkData']) {
+      var item = AppData.mapData[link];
+      if (item != null) {
+        if (!checkList.contains(item['id'])) {
+          LOG('--> add 1 : ${item['title']}');
+          checkList.add(item['id']);
+          result.add(
+              mainListItem(item, () {
+                onSelect(item);
+              })
+          );
+        }
+      }
+    }
+  }
+
+  if (AppData.mapInsideData[targetId] != null) {
+    for (var link in AppData.mapInsideData[targetId]['linkData']) {
+      var item = AppData.mapData[link];
+      if (item != null) {
+        if (!checkList.contains(item['id'])) {
+          LOG('--> add 2 : ${item['title']}');
+          checkList.add(item['id']);
+          result.add(
+              mainListItem(item, () {
+                onSelect(item);
+              })
+          );
+        }
+      }
+    }
+  }
+
   for (var item in AppData.mapLinkData.entries) {
     if (LIST_NOT_EMPTY(item.value['linkData'])) {
       for (var link in item.value['linkData']) {
         if (link == targetId && !checkList.contains(item.key)) {
+          var newItem = getMapLinkTitle(item.value, STR(AppData.mapData[targetId]['title']));
+          LOG('--> add 3 : ${newItem['title']} / ${newItem['titleEx']}');
+          newItem['type'] = 1;
           checkList.add(item.key);
           result.add(
-            mainListItem(item.value, () {
-              onSelect(item.value);
+            mainListItem(newItem, () {
+              onSelect(newItem);
             })
+          );
+        }
+      }
+    }
+  }
+  return result;
+}
+
+getMapLinkTitle(JSON item, String orgTitle) {
+  var titleArr    = STR(item['subTitle']).split(' - ');
+  var titleKrArr  = STR(item['subTitle_kr']).split(' - ');
+  LOG('--> getMapLinkTitle : $orgTitle / ${titleArr[0]}');
+  item['titleEx'   ] = '${STR(item['title'])} - ${titleArr[0] == orgTitle ? titleArr[0] : titleArr[1]}';
+  item['titleEx_kr'] = '${STR(item['title_kr'])} - ${titleArr[0] == orgTitle ? titleKrArr[0] : titleKrArr[1]}';
+  return item;
+}
+
+List<Widget> getInsideList(String targetId, Function(JSON) onSelect) {
+  List<Widget> result = [];
+  List<String> checkList = [];
+
+  if (AppData.mapData[targetId] != null && AppData.mapData[targetId]['insideData'] != null) {
+    for (var link in AppData.mapData[targetId]['insideData']) {
+      var item = AppData.mapInsideData[link];
+      if (item != null) {
+        if (!checkList.contains(item['id'])) {
+          checkList.add(item['id']);
+          result.add(
+              mainListItem(item, () {
+                onSelect(item);
+              })
           );
         }
       }

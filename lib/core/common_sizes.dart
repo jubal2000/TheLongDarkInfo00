@@ -37,6 +37,6 @@ const double side_gap_width = 10.0;
 
 const double item_height = 55.0;
 const double item_title_font_size = 16.0;
-const double item_title_info_font_size = 14.0;
+const double item_title_info_font_size = 12.0;
 const double item_desc_font_size = 12.0;
 const double main_menu_font_size = 10.0;
