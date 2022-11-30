@@ -14,9 +14,12 @@ import '../../core/common_colors.dart';
 import '../../core/dialogs.dart';
 import '../../core/utils.dart';
 import '../../service/api_service.dart';
+import '../../service/local_service.dart';
 
 class MapScreenController extends GetxController {
-  final api = Get.find<ApiService>();
+  final api   = Get.find<ApiService>();
+  final local = Get.find<LocalService>();
+
   final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
   final PhotoViewController photoViewController = PhotoViewController();
   final offset = 20.0;
@@ -26,6 +29,7 @@ class MapScreenController extends GetxController {
   String targetId = '';
   var pinSize = 10.0;
   var isDragOn = '';
+  var mapScale = 1.0;
 
   @override
   void onInit() {
@@ -110,9 +114,9 @@ class MapScreenController extends GetxController {
                     });
                   },
                   onPanUpdate: isDragOn.isNotEmpty ? (detail) {
-                    LOG('--> onPanUpdate : $dx / $dy - ${detail.delta}');
-                    item['dx'] = dx + detail.delta.dx;
-                    item['dy'] = dy + detail.delta.dy;
+                    item['dx'] = dx + detail.delta.dx * mapScale;
+                    item['dy'] = dy + detail.delta.dy * mapScale;
+                    LOG('--> onPanUpdate : $dx / $dy - ${detail.delta} * $mapScale -> ${item['dx']} / ${item['dy']}');
                     if (onUpdate != null) onUpdate(detail);
                   } : null,
                   child: showPinMark(context, item, isDragOn.isNotEmpty && isDragOn == itemId),
@@ -187,6 +191,16 @@ class MapScreenController extends GetxController {
         ]
       )
     );
+  }
+
+  clearPinMark(context) async {
+    var result = await showAlertYesNoDialog(context, 'Clear'.tr, 'Clear this map pin marks?'.tr, '', 'Cancel'.tr, 'OK'.tr);
+    if (result == 1) {
+      AppData.pinData[targetId]['data'] = [];
+      await local.writeLocalData('pinData', AppData.pinData);
+      return true;
+    }
+    return false;
   }
 
   searchPinPoint(double x, double y) {

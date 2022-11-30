@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
-import 'package:gesture_zoom_box/gesture_zoom_box.dart';
+// import 'package:gesture_zoom_box/gesture_zoom_box.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:helpers/helpers/widgets/align.dart';
@@ -12,8 +12,10 @@ import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 import '../../core/app_data.dart';
 import '../../core/common_sizes.dart';
+import '../../core/dialogs.dart';
 import '../../core/style.dart';
 import '../../core/utils.dart';
+import '../../global_widgets/gesture_zoom_box.dart';
 import '../../routes.dart';
 import 'map_screen_controller.dart';
 
@@ -35,6 +37,10 @@ class MapScreen extends GetView<MapScreenController> {
             body: GestureZoomBox(
               maxScale: 10.0,
               duration: Duration(milliseconds: 100),
+              onScaleChanged: (scale) {
+                // LOG('--> scale : $scale');
+                controller.mapScale = scale;
+              },
               child: Center(
                 child: Stack(
                   children: [
@@ -50,7 +56,6 @@ class MapScreen extends GetView<MapScreenController> {
                     ),
                     ...controller.getPinListWidget(context, (detail) {
                       setState(() {
-
                       });
                     }),
                   ],
@@ -88,27 +93,30 @@ class MapScreen extends GetView<MapScreenController> {
               ringDiameter: 280,
               ringWidth: 60,
               children: <Widget>[
-                mainMenu(Icons.share, 'LINK', () {
+                mainMenu(Icons.share, 'LINK'.tr, () {
+                  showLinkSelectDialog(context, controller.targetId).then((itemInfo) {
+                    LOG('--> itemInfo : $itemInfo');
+                    if (itemInfo != null) {
+                      setState(() {
+                        controller.targetInfo = itemInfo;
+                        controller.targetId = itemInfo['id'] ?? 'id_none';
+                      });
+                      // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
+                    }
+                  });
                 }, Theme.of(context).colorScheme.secondaryContainer),
-                // mainMenu(AppData.isRotateLock ? Icons.screen_lock_rotation : Icons.screen_rotation, AppData.isRotateLock ? 'LOCK' : 'UNLOCK', () {
-                //   setState(() {
-                //     AppData.isRotateLock = !AppData.isRotateLock;
-                //     // controller.photoViewController.reset();
-                //   });
-                // }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(Icons.star_border, 'OBJECT', () {
+                mainMenu(Icons.star_border, 'OBJECT'.tr, () {
                   setState(() {
-                    AppData.isRotateLock = !AppData.isRotateLock;
                     // controller.photoViewController.reset();
                   });
                 }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(Icons.cleaning_services_outlined, 'CLEAR', () {
-                  setState(() {
-                    AppData.isRotateLock = !AppData.isRotateLock;
-                    // controller.photoViewController.reset();
+                mainMenu(Icons.cleaning_services_outlined, 'CLEAR'.tr, () {
+                  controller.clearPinMark(context).then((result) {
+                    setState(() {
+                    });
                   });
                 }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(AppData.isPinShow ? Icons.visibility_outlined : Icons.visibility_off_outlined, AppData.isPinShow ? 'SHOW' : 'HIDE', () {
+                mainMenu(AppData.isPinShow ? Icons.visibility_outlined : Icons.visibility_off_outlined, AppData.isPinShow ? 'SHOW'.tr : 'HIDE'.tr, () {
                   setState(() {
                     AppData.isPinShow = !AppData.isPinShow;
                     // controller.photoViewController.reset();

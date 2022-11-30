@@ -8,9 +8,10 @@ class AppData {
 
   static JSON startData = {};
   static JSON mapData = {};
+  static JSON mapLinkData = {};
+  static JSON mapInsideData = {};
   static JSON pinData = {};
   static JSON listSelectData = {};
 
-  static bool isRotateLock = false;
   static bool isPinShow = true;
 }

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:the_long_dark_info/modules/home/home_controller.dart';
 import 'package:the_long_dark_info/modules/map/map_screen.dart';
 import 'package:the_long_dark_info/modules/map/map_screen_controller.dart';
 import 'package:the_long_dark_info/service/api_service.dart';
@@ -75,6 +76,9 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: Routes.HOME,
           page: () => Home(),
+          binding: BindingsBuilder(
+                () => {Get.put(HomeController())},
+          ),
         ),
         GetPage(
           name: Routes.MAP_SCREEN,

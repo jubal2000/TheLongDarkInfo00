@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -11,6 +12,7 @@ import 'package:the_long_dark_info/service/local_service.dart';
 import 'package:uuid/uuid.dart';
 
 import '../global_widgets/card_scroll_viewer.dart';
+import '../global_widgets/main_list_item.dart';
 import 'app_data.dart';
 import 'common_colors.dart';
 import 'utils.dart';
@@ -644,5 +646,126 @@ showColorSelectorDialog(BuildContext context, String title, Color selectColor) a
         )
       );
     }
+  );
+}
+
+Future showLinkSelectDialog(BuildContext context, String targetId)
+{
+  var api = Get.find<ApiService>();
+  return showDialog(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return PointerInterceptor(
+        child: AlertDialog(
+          title: Text('Link'.tr, style: dialogTitleTextStyle),
+          titlePadding: EdgeInsets.all(20),
+          insetPadding: EdgeInsets.all(20),
+          backgroundColor: dialogBgColor,
+          content: SingleChildScrollView(
+            child: FutureBuilder(
+              future: api.getMapLinkData(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    child: ListBody(
+                      children: getLinkList(targetId, (itemInfo) {
+                        Navigator.of(context).pop(itemInfo);
+                      }),
+                    )
+                  );
+                } else {
+                  return SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: CircularProgressIndicator()
+                  );
+                }
+              }
+            )
+          ),
+          actions: [
+            TextButton(
+              child: Text('Close'.tr),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+List<Widget> getLinkList(String targetId, Function(JSON) onSelect) {
+  List<Widget> result = [];
+  List<String> checkList = [];
+  for (var item in AppData.mapData.entries) {
+    if (LIST_NOT_EMPTY(item.value['linkData'])) {
+      for (var link in item.value['linkData']) {
+        if (link == targetId && !checkList.contains(item.key)) {
+          checkList.add(item.key);
+          result.add(
+            mainListItem(item.value, () {
+              onSelect(item.value);
+            })
+          );
+        }
+      }
+    }
+  }
+  for (var item in AppData.mapLinkData.entries) {
+    if (LIST_NOT_EMPTY(item.value['linkData'])) {
+      for (var link in item.value['linkData']) {
+        if (link == targetId && !checkList.contains(item.key)) {
+          checkList.add(item.key);
+          result.add(
+            mainListItem(item.value, () {
+              onSelect(item.value);
+            })
+          );
+        }
+      }
+    }
+  }
+  return result;
+}
+
+Future showButtonDialog(BuildContext context,
+    String title,
+    String message1,
+    String message2,
+    List<Widget> actionList)
+{
+  return showDialog(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return PointerInterceptor(
+        child: AlertDialog(
+          title: Text(title, style: dialogTitleTextStyle),
+          titlePadding: EdgeInsets.all(20),
+          insetPadding: EdgeInsets.all(20),
+          backgroundColor: dialogBgColor,
+          content: SingleChildScrollView(
+            child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: ListBody(
+                    children: [
+                      Text(message1, style: dialogDescTextStyle),
+                      if (message2.isNotEmpty)...[
+                        SizedBox(height: 10),
+                        Text(message2, style: dialogDescTextExStyle),
+                      ],
+                    ]
+                )
+            ),
+          ),
+          actions: actionList,
+        ),
+      );
+    },
   );
 }

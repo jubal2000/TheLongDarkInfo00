@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:the_long_dark_info/core/style.dart';
 
+import 'common_colors.dart';
+
 typedef JSON = Map<dynamic, dynamic>;
 typedef SnapShot = QuerySnapshot<Map<String, dynamic>>;
 const String NO_IMAGE = 'assets/app_icon_01.png';
@@ -624,6 +626,112 @@ class DropdownItems {
           //   endIndent: 0,
           // ),
         ]
+    );
+  }
+}
+//
+// extension GestureZoomBoxHelper on GestureZoomBox {
+//   onScaleChanged() {
+//
+//   }
+// }
+
+class Tile extends StatelessWidget {
+  Tile({
+    Key? key,
+    required this.index,
+    this.title,
+    this.mapInfo,
+    this.extent,
+    this.color,
+    this.bottomSpace,
+    this.onSelect,
+  }) : super(key: key);
+
+  final int index;
+  final double? extent;
+  final double? bottomSpace;
+  final Color? color;
+  final String? title;
+  final JSON? mapInfo;
+  final Function(JSON)? onSelect;
+
+  final TextStyle titleStyle   = TextStyle(fontSize: 12, color: NAVY, fontWeight: FontWeight.w700);
+  final TextStyle titleExStyle = TextStyle(fontSize: 8, color: Colors.black38, fontWeight: FontWeight.w600);
+
+  @override
+  Widget build(BuildContext context) {
+    final child = GestureDetector(
+      onTap: () {
+        if (onSelect != null) onSelect!(mapInfo ?? {});
+      },
+      child: Container(
+        height: extent,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: color ?? Colors.white,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (mapInfo == null && title != null)...[
+                Text(title!, style: titleStyle, textAlign: TextAlign.center),
+              ],
+              if (mapInfo != null)...[
+                Text(STR(mapInfo!['title_kr']), style: titleStyle, textAlign: TextAlign.center),
+                SizedBox(height: 3),
+                Text(STR(mapInfo!['title']), style: titleExStyle, textAlign: TextAlign.center),
+              ]
+              // Text('$index', style: titleStyle),
+            ],
+          )
+          // child: CircleAvatar(
+          //   minRadius: 20,
+          //   maxRadius: 20,
+          //   backgroundColor: Colors.white,
+          //   foregroundColor: Colors.black,
+          //   child: Text('$index', style: const TextStyle(fontSize: 20)),
+          // ),
+        ),
+      )
+    );
+
+    if (bottomSpace == null) {
+      return child;
+    }
+
+    return Column(
+      children: [
+        Expanded(child: child),
+        Container(
+          height: bottomSpace,
+          color: Colors.green,
+        )
+      ],
+    );
+  }
+}
+
+class ImageTile extends StatelessWidget {
+  const ImageTile({
+    Key? key,
+    required this.index,
+    required this.width,
+    required this.height,
+  }) : super(key: key);
+
+  final int index;
+  final int width;
+  final int height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.network(
+      'https://picsum.photos/$width/$height?random=$index',
+      width: width.toDouble(),
+      height: height.toDouble(),
+      fit: BoxFit.cover,
     );
   }
 }

@@ -37,7 +37,15 @@ class ApiService extends GetxService {
     }
   }
 
+  Future<dynamic> getMapDataAll() async {
+    var result1 = await getMapData();
+    var result2 = await getMapLinkData();
+    var result3 = await getMapInsideData();
+    return result1;
+  }
+
   Future<dynamic> getMapData() async {
+    if (JSON_NOT_EMPTY(AppData.mapData)) return AppData.mapData;
     try {
       var collectionRef = firebase.firestore!.collection('info_map');
       var querySnapshot = await collectionRef.
@@ -55,6 +63,52 @@ class ApiService extends GetxService {
       }
     } catch (e) {
       LOG('--> getMapData Error : $e');
+      return {'error' : e.toString()};
+    }
+  }
+
+  Future<dynamic> getMapLinkData() async {
+    if (JSON_NOT_EMPTY(AppData.mapLinkData)) return AppData.mapLinkData;
+    try {
+      var collectionRef = firebase.firestore!.collection('info_cave');
+      var querySnapshot = await collectionRef.
+      get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (var doc in querySnapshot.docs) {
+          AppData.mapLinkData[doc.data()['id']] = FROM_SERVER_DATA(doc.data());
+          // LOG('--> resultData [${outName[i]}]: ${doc.data()}');
+        }
+        LOG('--> getMapLinkData result : ${AppData.mapLinkData}');
+        return AppData.mapLinkData;
+      } else {
+        return {'error' : 'no data'};
+      }
+    } catch (e) {
+      LOG('--> getMapLinkData Error : $e');
+      return {'error' : e.toString()};
+    }
+  }
+
+  Future<dynamic> getMapInsideData() async {
+    if (JSON_NOT_EMPTY(AppData.mapInsideData)) return AppData.mapInsideData;
+    try {
+      var collectionRef = firebase.firestore!.collection('info_inside');
+      var querySnapshot = await collectionRef.
+      get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (var doc in querySnapshot.docs) {
+          AppData.mapInsideData[doc.data()['id']] = FROM_SERVER_DATA(doc.data());
+          // LOG('--> resultData [${outName[i]}]: ${doc.data()}');
+        }
+        LOG('--> getMapInsideData result : ${AppData.mapInsideData}');
+        return AppData.mapInsideData;
+      } else {
+        return {'error' : 'no data'};
+      }
+    } catch (e) {
+      LOG('--> getMapInsideData Error : $e');
       return {'error' : e.toString()};
     }
   }
