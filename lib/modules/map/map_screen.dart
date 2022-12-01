@@ -54,7 +54,7 @@ class MapScreen extends GetView<MapScreenController> {
                       },
                       child: showImageFit(STR(controller.targetInfo['map_full'])),
                     ),
-                    ...controller.getPinListWidget(context, (detail) {
+                    ...controller.getPinListWidget(context, () {
                       setState(() {
                       });
                     }),

@@ -414,16 +414,37 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
   final local             = Get.find<LocalService>();
   final titleController   = TextEditingController();
   final editController    = TextEditingController();
+  final imageGalleryKey   = GlobalKey();
 
+  const iconSize = 50.0;
+
+  JSON iconList = {};
   JSON jsonData = {};
   var isChanged = false;
+  var isNew = true;
+  var selectIcon = '';
+  var isSelectIcon = false;
+  var selectColor = Colors.white;
 
   initData() {
     jsonData = {};
     jsonData.addAll(pinData);
+    isNew = STR(jsonData['id']).isEmpty;
+    selectColor = STR(jsonData['color']).isNotEmpty ? COL(jsonData['color']) : Colors.white;
+    if (isNew) {
+      jsonData['id'] = Uuid().v1().toString();
+    }
+    for (var i=0; i<GameIcons.length; i++) {
+      iconList['$i'] = {
+        'id': '$i',
+        'icon': i,
+      };
+    }
     titleController.text  = STR(jsonData['title']);
     editController.text   = STR(jsonData['desc']);
-    LOG('--> showPinEditDialog : $targetId / $pinData');
+    selectIcon = jsonData['icon'] ?? '0';
+    jsonData['icon'] = selectIcon;
+    LOG('--> showPinEditDialog [${isNew ? 'NEW' : '?EDIT'}] : ${jsonData['id']} / $selectColor / $targetId / $pinData');
   }
 
   initData();
@@ -434,15 +455,10 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
       return PointerInterceptor(
         child: StatefulBuilder(
           builder: (context, setState) {
+            // LOG('--> icon : ${selectIcon.isNotEmpty ? STR(iconList[selectIcon]['backPic']) : 'none'}');
             return AlertDialog(
               scrollable: true,
-              title: Row(
-                children: [
-                  Icon(Icons.place_outlined, size: 24),
-                  SizedBox(width: 5),
-                  Text('Pin edit'.tr, style: dialogTitleTextStyle)
-                ],
-              ),
+              title: Text(isNew ? 'Mark add'.tr : 'Mark edit'.tr, style: dialogTitleTextStyle),
               // titleTextStyle: type == CommentType.message ? _titleText2 : _titleText,
               insetPadding: EdgeInsets.all(15),
               contentPadding: EdgeInsets.symmetric(horizontal: 10),
@@ -457,11 +473,50 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 10),
+                    if (!isSelectIcon)...[
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isSelectIcon = true;
+                          });
+                        },
+                        child: Icon(GameIcons[int.parse(STR(iconList[selectIcon]['icon']))], size: iconSize, color: selectColor)
+                          // showImage(STR(iconList[selectIcon]['backPic']), Size(iconSize, iconSize), selectColor),
+                      ),
+                    ],
+                    if (isSelectIcon)...[
+                      Container(
+                        color: Colors.blueGrey,
+                        child: CardScrollViewer(
+                          iconList,
+                          key: imageGalleryKey,
+                          title: '',
+                          isEditable: false,
+                          itemWidth: iconSize,
+                          itemHeight: iconSize,
+                          imageMax: 1,
+                          onActionCallback: (key, status) {
+                            // LOG('--> icon select : $key / $status');
+                            if (status == 1) {
+                              setState(() {
+                                isSelectIcon = false;
+                                selectIcon = key;
+                                jsonData['icon'] = key;
+                                // jsonData['image'] = iconList[selectIcon]['backPic'];
+                              });
+                            }
+                          }
+                        )
+                      ),
+                    ],
+                    SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
-                        showColorSelectorDialog(context, 'COLOR SELECT', COL(jsonData['color'])).then((result) {
+                        showColorSelectorDialog(context, 'COLOR SELECT', selectColor).then((result) {
+                          if (result == null) return;
                           setState(() {
                             jsonData['color'] = COL2STR(result);
+                            selectColor = result;
                             LOG('--> showColorSelectorDialog result : ${result.toString()} -> ${jsonData['color']}');
                           });
                         });
@@ -473,10 +528,6 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                         decoration: BoxDecoration(
                           color: COL(jsonData['color']),
                           borderRadius: BorderRadius.all(Radius.circular(8)),
-                          border: Border.all(
-                            color: Theme.of(context).primaryColor,
-                            width: 1.0,
-                          ),
                         ),
                         child: Center(
                           child: Text('COLOR SELECT', style: itemDescStyle, textAlign: TextAlign.center),
@@ -484,12 +535,13 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                         ,
                       ),
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 20),
                     TextFormField(
                       controller: titleController,
                       decoration: inputLabel(context, 'Title'.tr, ''),
                       keyboardType: TextInputType.multiline,
                       maxLines: 1,
+                      maxLength: 24,
                       // style: _editText,
                       onChanged: (value) {
                         setState(() {
@@ -504,6 +556,8 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                       decoration: inputLabel(context, 'Description'.tr, ''),
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
+                      minLines: 4,
+                      maxLength: 200,
                       // style: _editText,
                       onChanged: (value) {
                         setState(() {
@@ -517,6 +571,13 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
               ),
               actions: [
                 TextButton(
+                  child: Text('Delete'.tr, style: TextStyle(color: Colors.deepPurpleAccent)),
+                  onPressed: () {
+                    Navigator.pop(dlgContext, {'delete' : 'ok'});
+                  },
+                ),
+                showVerticalDivider(Size(40, 20)),
+                TextButton(
                   child: Text('Cancel'.tr),
                   onPressed: () {
                     Navigator.pop(dlgContext, {});
@@ -527,21 +588,23 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                   onPressed: () {
                     showLoadingDialog(context, 'writing now...'.tr);
                     Future.delayed(Duration(milliseconds: 200), () async {
-                      AppData.pinData[targetId]['data'].add(jsonData);
+                      LOG('--> add pin [$targetId] : $jsonData');
+                      if (isNew) {
+                        AppData.pinData[targetId]['data'].add(jsonData);
+                      } else {
+                        for (var i=0; i<AppData.pinData[targetId]['data'].length; i++) {
+                          var item = AppData.pinData[targetId]['data'][i];
+                          if (STR(item['id']) == STR(jsonData['id'])) {
+                            AppData.pinData[targetId]['data'][i] = jsonData;
+                            break;
+                          }
+                        }
+                      }
                       await local.writeLocalData('pinData', AppData.pinData);
                       Navigator.of(dialogContext!).pop();
                       Future.delayed(Duration(milliseconds: 200), () async {
                         Navigator.pop(dlgContext, jsonData);
                       });
-                      // JSON upResult = await api.addPinData(jsonData);
-                      // if (upResult['error'] == null) {
-                      //   var resultData = FROM_SERVER_DATA(jsonData);
-                      //   upResult = {'status': 'success', 'result': resultData};
-                      // }
-                      // Navigator.of(dialogContext!).pop();
-                      // Future.delayed(Duration(milliseconds: 200), () async {
-                      //   Navigator.pop(dlgContext, upResult);
-                      // });
                     });
                   }
                 )
@@ -582,8 +645,6 @@ showLoadingDialog(BuildContext context, String message) {
 }
 
 const List<Color> colorSelectLists = [
-  Colors.red,
-  Colors.pink,
   Colors.purple,
   Colors.deepPurple,
   Colors.indigo,
@@ -598,6 +659,8 @@ const List<Color> colorSelectLists = [
   Colors.amber,
   Colors.orange,
   Colors.deepOrange,
+  Colors.red,
+  Colors.pink,
   Colors.brown,
   Colors.grey,
   Colors.blueGrey,
@@ -607,47 +670,88 @@ const List<Color> colorSelectLists = [
 showColorSelectorDialog(BuildContext context, String title, Color selectColor) async {
   return await showDialog(
     context: context,
-    barrierColor: Colors.black87,
+    barrierColor: Colors.black38,
     builder: (BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-              children: [
-                ColorPicker(
-                  paletteType: PaletteType.hsl,
+      return PointerInterceptor(
+          child: StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Pick a color!'),
+              content: SingleChildScrollView(
+                child: BlockPicker(
                   pickerColor: selectColor,
-                  colorHistory: colorSelectLists,
-                  onColorChanged: (Color value) {
-                    selectColor = value;
+                  onColorChanged: (color) {
+                    Navigator.of(context).pop(color);
+                  },
+                  availableColors: colorSelectLists,
+                  layoutBuilder: pickerLayoutBuilder,
+                  itemBuilder: pickerItemBuilder,
+                ),
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: Text('Exit'.tr),
+                  onPressed: () {
+                    Navigator.of(context).pop();
                   },
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop(selectColor);
-                  },
-                  child: Container(
-                    width: 200,
-                    height: 40,
-                    margin: EdgeInsets.only(top: 10),
-                    alignment: Alignment.center,
-                    child: Text('Select'.tr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).canvasColor,
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                  ),
-                ),
-              ]
-            )
-          )
-        )
+              ],
+            );
+          }
+        ),
       );
     }
   );
 }
+
+int _portraitCrossAxisCount = 4;
+int _landscapeCrossAxisCount = 5;
+double _borderRadius = 30;
+double _blurRadius = 5;
+double _iconSize = 24;
+
+Widget pickerLayoutBuilder(BuildContext context, List<Color> colors, PickerItem child) {
+  Orientation orientation = MediaQuery.of(context).orientation;
+
+  return SizedBox(
+    width: 300,
+    height: orientation == Orientation.portrait ? 360 : 240,
+    child: GridView.count(
+      crossAxisCount: orientation == Orientation.portrait ? _portraitCrossAxisCount : _landscapeCrossAxisCount,
+      crossAxisSpacing: 5,
+      mainAxisSpacing: 5,
+      children: [for (Color color in colors) child(color)],
+    ),
+  );
+}
+
+Widget pickerItemBuilder(Color color, bool isCurrentColor, void Function() changeColor) {
+  return Container(
+    margin: const EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(_borderRadius),
+      color: color,
+      boxShadow: [BoxShadow(color: color.withOpacity(0.8), offset: const Offset(1, 2), blurRadius: _blurRadius)],
+    ),
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: changeColor,
+        borderRadius: BorderRadius.circular(_borderRadius),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 250),
+          opacity: isCurrentColor ? 1 : 0,
+          child: Icon(
+            Icons.done,
+            size: _iconSize,
+            color: useWhiteForeground(color) ? Colors.white : Colors.black,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 
 Future showLinkSelectDialog(BuildContext context, String targetId, {bool isInside = false})
 {
@@ -782,9 +886,10 @@ List<Widget> getLinkList(String targetId, Function(JSON) onSelect) {
 getMapLinkTitle(JSON item, String orgTitle) {
   var titleArr    = STR(item['subTitle']).split(' - ');
   var titleKrArr  = STR(item['subTitle_kr']).split(' - ');
-  LOG('--> getMapLinkTitle : $orgTitle / ${titleArr[0]}');
-  item['titleEx'   ] = '${STR(item['title'])} - ${titleArr[0] == orgTitle ? titleArr[0] : titleArr[1]}';
-  item['titleEx_kr'] = '${STR(item['title_kr'])} - ${titleArr[0] == orgTitle ? titleKrArr[0] : titleKrArr[1]}';
+  LOG('--> getMapLinkTitle : $orgTitle / ${titleArr[0]} - ${titleArr[1]}');
+  item['titleEx'   ] = '${STR(item['title'])} - ${titleArr[0] != orgTitle ? titleArr[0] : titleArr[1]}';
+  item['titleEx_kr'] = '${STR(item['title_kr'])} - ${titleArr[0] != orgTitle ? titleKrArr[0] : titleKrArr[1]}';
+  LOG('--> item : $item');
   return item;
 }
 

@@ -152,7 +152,7 @@ class _GestureZoomBoxState extends State<GestureZoomBox>
     );
 
     _latestScaleUpdateDetails = details;
-    LOG('--> _scale : $_scale');
+    // LOG('--> _scale : $_scale');
     if (widget.onScaleChanged != null) widget.onScaleChanged!(_scale);
   }
 

@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import '../core/common_colors.dart';
 import '../core/common_sizes.dart';
@@ -31,3 +33,24 @@ TextStyle itemTitleColorStyle = TextStyle(
     fontSize: item_title_font_size, color: Colors.deepPurple, fontWeight: FontWeight.w700);
 TextStyle itemDescStyle = TextStyle(
     fontSize: item_desc_font_size, color: Colors.black54, fontWeight: FontWeight.w600);
+
+// pin..
+TextStyle pinTitleStyle = TextStyle(
+    fontSize: pin_title_font_size, color: Colors.black, fontWeight: FontWeight.w600, height: 1.1,
+    shadows: outlinedText(strokeWidth: 0.2, strokeColor: Colors.white));
+
+/// Outlines a text using shadows.
+List<Shadow> outlinedText({double strokeWidth = 1, Color strokeColor = Colors.black, int precision = 4}) {
+  Set<Shadow> result = HashSet();
+  for (double x = 1; x < strokeWidth + precision; x++) {
+    for(double y = 1; y < strokeWidth + precision; y++) {
+      double offsetX = x.toDouble();
+      double offsetY = y.toDouble();
+      result.add(Shadow(offset: Offset(-strokeWidth / offsetX, -strokeWidth / offsetY), color: strokeColor));
+      result.add(Shadow(offset: Offset(-strokeWidth / offsetX, strokeWidth / offsetY), color: strokeColor));
+      result.add(Shadow(offset: Offset(strokeWidth / offsetX, -strokeWidth / offsetY), color: strokeColor));
+      result.add(Shadow(offset: Offset(strokeWidth / offsetX, strokeWidth / offsetY), color: strokeColor));
+    }
+  }
+  return result.toList();
+}

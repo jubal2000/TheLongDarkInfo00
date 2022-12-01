@@ -64,9 +64,9 @@ class CardScrollViewer extends StatefulWidget {
         this.isShowMenu = false,
         this.isVerticalScroll = false,
         this.isImageExView = false,
-        this.isAddButtonShow = true,
+        this.isAddButtonShow = false,
         this.isThumbShow = true,
-        this.isCanDownload = true,
+        this.isCanDownload = false,
         this.selectText = '',
         this.selectedId = '',
         this.selectTextStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
@@ -184,15 +184,8 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                       });
                     } else if (widget.isImageExView) {
                       onSelected('${item.key}', 0);
-                    // } else if (!widget.isEditable) {
-                    //   var keyList = widget.itemList.keys.toList();
-                    //   int index = keyList.indexOf(item.key);
-                    //   showImageSlideDialog(context,
-                    //       List<String>.from(widget.itemList.entries.map((item) => item.value['linkPic'] ?? item.value['backPic'] ?? item.value['image']).toList()),
-                    //       index, widget.isCanDownload);
-                    //   // showImageDialog(context, widget.itemList[item.key]['backPic'] ?? widget.itemList[item.key]['image']);
                     } else if (widget.imageMax == 1) {
-                      onSelected('', 1);
+                      onSelected('${item.key}', 1);
                     }
                   },
                   child: Stack(
@@ -202,7 +195,7 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                             padding: EdgeInsets.symmetric(horizontal: widget.isVerticalScroll ? 0 : 2.5, vertical: widget.isVerticalScroll ? 5 : 0),
                             child: Column(
                                 children: [
-                                  if (item.value['image'] != null || (widget.isThumbShow && item.value['thumb'] != null) || item.value['backPic'] != null)
+                                  if (item.value['image'] != null || (widget.isThumbShow && item.value['thumb'] != null) || item.value['backPic'] != null || item.value['icon'] != null)
                                     SizedBox(
                                       width: widget.itemWidth,
                                       height: widget.itemHeight,
@@ -211,11 +204,9 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                                         child: widget.isThumbShow && item.value['thumb'] != null
                                             ? Image.memory(item.value['thumb'], fit: widget.backFit) :
                                         item.value['image'] != null
-                                            ? Image.memory(item.value['image'], fit: widget.backFit)
-                                        //: showImageWidget(
-                                        //     item.value['backPic'] != null ? (STR(item.value['backPic']).contains('backPic') ?
-                                        //     JSON.from(jsonDecode(STR(item.value['backPic'])))['backPic'] : item.value['backPic']) : item.value['pic'], widget.backFit)
-                                            : showImageWidget(item.value['backPic'], widget.backFit),
+                                            ? Image.memory(item.value['image'], fit: widget.backFit) :
+                                        item.value['icon'] != null ? Icon(GameIcons[INT(item.value['icon'])], size: widget.itemHeight) :
+                                        showImageWidget(item.value['backPic'], widget.backFit),
                                       ),
                                     ),
                                   if (item.value['title'] != null)

@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:helpers/helpers.dart';
+import 'package:the_long_dark_info/core/style.dart';
 import 'package:tphoto_view/photo_view.dart';
 import 'package:uuid/uuid.dart';
 
@@ -27,7 +28,7 @@ class MapScreenController extends GetxController {
 
   JSON targetInfo = {};
   String targetId = '';
-  var pinSize = 10.0;
+  var pinSize = 5.0;
   var isDragOn = '';
   var mapScale = 1.0;
 
@@ -50,7 +51,6 @@ class MapScreenController extends GetxController {
       };
     }
     var pinData = {
-      'id': Uuid().v1.toString(),
       'dx': dx,
       'dy': dy,
       'title': '',
@@ -69,8 +69,8 @@ class MapScreenController extends GetxController {
         var dy = DBL(item['dy']);
         result.add(
           Positioned(
-            left: dx - pinSize * 0.5,
-            top:  dy - pinSize,
+            left: dx - pinSize * 1.5,
+            top:  dy - pinSize * 2.5,
             child: StatefulBuilder(
               builder: (context, setState) {
                 Timer? timer;
@@ -86,6 +86,20 @@ class MapScreenController extends GetxController {
                     });
                   },
                   onTapUp: (_) {
+                    if (isDragOn.isEmpty) {
+                      showPinEditDialog(context, targetId, item).then((result) {
+                        if (result['delete'] != null) {
+                          showAlertYesNoDialog(context, 'Delete'.tr, 'Delete this mark?', '', 'Cancel'.tr, 'OK'.tr).then((result2) {
+                            if (result2 == 1) {
+                              AppData.pinData[targetId]['data'].remove(item);
+                              if (onUpdate != null) onUpdate();
+                            }
+                          });
+                        } else {
+                          if (onUpdate != null) onUpdate();
+                        }
+                      });
+                    }
                     if (timer != null) {
                       timer!.cancel();
                       timer = null;
@@ -117,7 +131,7 @@ class MapScreenController extends GetxController {
                     item['dx'] = dx + detail.delta.dx * mapScale;
                     item['dy'] = dy + detail.delta.dy * mapScale;
                     LOG('--> onPanUpdate : $dx / $dy - ${detail.delta} * $mapScale -> ${item['dx']} / ${item['dy']}');
-                    if (onUpdate != null) onUpdate(detail);
+                    if (onUpdate != null) onUpdate();
                   } : null,
                   child: showPinMark(context, item, isDragOn.isNotEmpty && isDragOn == itemId),
                 );
@@ -167,26 +181,67 @@ class MapScreenController extends GetxController {
   }
 
   showPinMark(context, item, [bool isDragOn = false]) {
-    return SizedBox(
-      width:  pinSize,
-      height: pinSize,
+    var iconIndex = int.parse(STR(item['icon']));
+    return Container(
+      width:  pinSize * 4,
+      height: pinSize * 3,
+      // color: Colors.black12,
       child: Stack(
         children: [
-          BottomCenterAlign(
-            child: Icon(Icons.circle, size: pinSize * 0.2, color: isDragOn ? Colors.red : COL(item['color'])),
-          ),
-          if (AppData.isPinShow)...[
-            Icon(Icons.place, size: pinSize, color: Colors.black87),
-            Positioned(
-              left: 2,
-              top: 1.6,
-              child: Icon(Icons.place, size: pinSize - 4, color: Colors.black87),
+          if (STR(item['icon']).isNotEmpty)...[
+            if (!AppData.isPinShow)...[
+              BottomCenterAlign(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: pinSize * 0.5),
+                  child: Icon(Icons.circle, size: pinSize * 0.5, color: isDragOn ? Colors.red : COL(item['color'])),
+                ),
+              )
+            ],
+            if (AppData.isPinShow)...[
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(STR(item['title']), style: pinTitleStyle, textAlign: TextAlign.center),
+                    // Container(
+                    //   padding: EdgeInsets.all(1),
+                    //   decoration: BoxDecoration(
+                    //     color: Colors.white54,
+                    //     borderRadius: BorderRadius.all(Radius.circular(1.5)),
+                    //   ),
+                    //   child: Text(STR(item['title']), style: pinTitleStyle),
+                    Stack(
+                      children: [
+                        Icon(GameIcons[iconIndex], size: pinSize+1, color: Colors.black),
+                        Positioned(
+                          left: 0.5,
+                          top: 0.5,
+                          child: Icon(GameIcons[iconIndex], size: pinSize, color: COL(item['color'])),
+                        )
+                      ]
+                    )
+                  ]
+                )
+              )
+            ]
+          ],
+          if (STR(item['icon']).isEmpty)...[
+            BottomCenterAlign(
+              child: Icon(Icons.circle, size: pinSize * 0.2, color: isDragOn ? Colors.red : COL(item['color'])),
             ),
-            Positioned(
-              left: 0.5,
-              top: 0.45,
-              child: Icon(Icons.place, size: pinSize - 1, color: isDragOn ? Colors.red : COL(item['color'])),
-            ),
+            if (AppData.isPinShow)...[
+              Icon(Icons.place, size: pinSize, color: Colors.black87),
+              Positioned(
+                left: 2,
+                top: 1.6,
+                child: Icon(Icons.place, size: pinSize - 4, color: Colors.black87),
+              ),
+              Positioned(
+                left: 0.5,
+                top: 0.45,
+                child: Icon(Icons.place, size: pinSize - 1, color: isDragOn ? Colors.red : COL(item['color'])),
+              ),
+            ]
           ],
         ]
       )

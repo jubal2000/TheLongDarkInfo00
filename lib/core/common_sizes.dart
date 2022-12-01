@@ -40,3 +40,4 @@ const double item_title_font_size = 16.0;
 const double item_title_info_font_size = 12.0;
 const double item_desc_font_size = 12.0;
 const double main_menu_font_size = 10.0;
+const double pin_title_font_size = 2.5;
