@@ -385,8 +385,8 @@ Future<JSON> showPinUploadDialog(BuildContext context, JSON pinData) async {
                               if (STR(jsonData['pic']).isEmpty) jsonData['pic'] = item.value['backPic'];
                             }
                           }
-                          JSON upResult = await api.addPinData(jsonData);
-                          if (upResult['error'] == null) {
+                          JSON? upResult = await api.addPinData(jsonData);
+                          if (upResult != null) {
                             var resultData = FROM_SERVER_DATA(jsonData);
                             upResult = {'status': 'success', 'result': resultData};
                           }
@@ -570,13 +570,15 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                 )
               ),
               actions: [
-                TextButton(
-                  child: Text('Delete'.tr, style: TextStyle(color: Colors.deepPurpleAccent)),
-                  onPressed: () {
-                    Navigator.pop(dlgContext, {'delete' : 'ok'});
-                  },
-                ),
-                showVerticalDivider(Size(40, 20)),
+                if (!isNew)...[
+                  TextButton(
+                    child: Text('Delete'.tr, style: TextStyle(color: Colors.deepPurpleAccent)),
+                    onPressed: () {
+                      Navigator.pop(dlgContext, {'delete' : 'ok'});
+                    },
+                  ),
+                  showVerticalDivider(Size(40, 20)),
+                ],
                 TextButton(
                   child: Text('Cancel'.tr),
                   onPressed: () {
@@ -645,27 +647,95 @@ showLoadingDialog(BuildContext context, String message) {
 }
 
 const List<Color> colorSelectLists = [
+  Colors.white,
   Colors.purple,
+  Colors.purpleAccent,
   Colors.deepPurple,
+  Colors.deepPurpleAccent,
   Colors.indigo,
+  Colors.indigoAccent,
   Colors.blue,
+  Colors.blueAccent,
   Colors.lightBlue,
+  Colors.lightBlueAccent,
   Colors.cyan,
+  Colors.cyanAccent,
   Colors.teal,
+  Colors.tealAccent,
   Colors.green,
+  Colors.greenAccent,
   Colors.lightGreen,
+  Colors.lightGreenAccent,
   Colors.lime,
+  Colors.limeAccent,
   Colors.yellow,
+  Colors.yellowAccent,
   Colors.amber,
+  Colors.amberAccent,
   Colors.orange,
+  Colors.orangeAccent,
+  Colors.deepOrangeAccent,
   Colors.deepOrange,
   Colors.red,
+  Colors.redAccent,
   Colors.pink,
+  Colors.pinkAccent,
   Colors.brown,
   Colors.grey,
   Colors.blueGrey,
   Colors.black,
 ];
+
+int _portraitCrossAxisCount = 5;
+int _landscapeCrossAxisCount = 6;
+double _borderRadius = 8;
+double _blurRadius = 5;
+double _iconSize = 24;
+
+Widget pickerLayoutBuilder(BuildContext context, List<Color> colors, PickerItem child) {
+  Orientation orientation = MediaQuery.of(context).orientation;
+
+  return SizedBox(
+    width: 400,
+    height: orientation == Orientation.portrait ? 460 : 340,
+    child: GridView.count(
+      crossAxisCount: orientation == Orientation.portrait ? _portraitCrossAxisCount : _landscapeCrossAxisCount,
+      crossAxisSpacing: 0,
+      mainAxisSpacing: 0,
+      children: [for (Color color in colors) child(color)],
+    ),
+  );
+}
+
+Widget pickerItemBuilder(Color color, bool isCurrentColor, void Function() changeColor) {
+  return Container(
+    margin: const EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(_borderRadius)),
+      color: color,
+      border: Border.all(
+        color: Colors.black26
+      ),
+      boxShadow: [BoxShadow(color: color.withOpacity(0.8), offset: const Offset(1, 2), blurRadius: _blurRadius)],
+    ),
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: changeColor,
+        borderRadius: BorderRadius.circular(_borderRadius),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 250),
+          opacity: isCurrentColor ? 1 : 0,
+          child: Icon(
+            Icons.done,
+            size: _iconSize,
+            color: useWhiteForeground(color) ? Colors.white : Colors.black,
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
 showColorSelectorDialog(BuildContext context, String title, Color selectColor) async {
   return await showDialog(
@@ -704,56 +774,7 @@ showColorSelectorDialog(BuildContext context, String title, Color selectColor) a
   );
 }
 
-int _portraitCrossAxisCount = 4;
-int _landscapeCrossAxisCount = 5;
-double _borderRadius = 30;
-double _blurRadius = 5;
-double _iconSize = 24;
-
-Widget pickerLayoutBuilder(BuildContext context, List<Color> colors, PickerItem child) {
-  Orientation orientation = MediaQuery.of(context).orientation;
-
-  return SizedBox(
-    width: 300,
-    height: orientation == Orientation.portrait ? 360 : 240,
-    child: GridView.count(
-      crossAxisCount: orientation == Orientation.portrait ? _portraitCrossAxisCount : _landscapeCrossAxisCount,
-      crossAxisSpacing: 5,
-      mainAxisSpacing: 5,
-      children: [for (Color color in colors) child(color)],
-    ),
-  );
-}
-
-Widget pickerItemBuilder(Color color, bool isCurrentColor, void Function() changeColor) {
-  return Container(
-    margin: const EdgeInsets.all(8),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(_borderRadius),
-      color: color,
-      boxShadow: [BoxShadow(color: color.withOpacity(0.8), offset: const Offset(1, 2), blurRadius: _blurRadius)],
-    ),
-    child: Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: changeColor,
-        borderRadius: BorderRadius.circular(_borderRadius),
-        child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 250),
-          opacity: isCurrentColor ? 1 : 0,
-          child: Icon(
-            Icons.done,
-            size: _iconSize,
-            color: useWhiteForeground(color) ? Colors.white : Colors.black,
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-
-Future showLinkSelectDialog(BuildContext context, String targetId, {bool isInside = false})
+Future showLinkSelectDialog(BuildContext context, String targetId, {bool isInside = false, bool isAll = false})
 {
   var api = Get.find<ApiService>();
   return showDialog(
@@ -768,7 +789,7 @@ Future showLinkSelectDialog(BuildContext context, String targetId, {bool isInsid
           backgroundColor: dialogBgColor,
           content: SingleChildScrollView(
             child: FutureBuilder(
-              future: isInside ? api.getMapInsideData() : api.getMapLinkData(),
+              future: isAll ? api.getMapLinkDataAll() : isInside ? api.getMapInsideData() : api.getMapLinkData(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return SizedBox(

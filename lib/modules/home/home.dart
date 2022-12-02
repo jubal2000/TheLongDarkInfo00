@@ -89,175 +89,189 @@ class Home extends GetView<HomeController> {
                 ],
               ),
               body: Container(
-                color: Colors.blueGrey.withOpacity(0.2),
-                padding: EdgeInsets.symmetric(horizontal: side_gap_width, vertical: 2),
+                color: NAVY.shade100,
+                // decoration: BoxDecoration(
+                //   image: DecorationImage(
+                //     image: AssetImage("assets/back/background_01.png"),
+                //     repeat: ImageRepeat.repeat,
+                //     scale: 2,
+                //   ),
+                // ),
                 child: FutureBuilder(
                   future: controller.getMapData(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       if (snapshot.data['error'] == null) {
                         if (controller.isMapMode) {
-                          return GestureZoomBox(
-                            maxScale: 10.0,
-                            duration: Duration(milliseconds: 100),
-                            onScaleChanged: (scale) {
-                              // LOG('--> scale : $scale');
-                              controller.mapScale = scale;
-                            },
-                            child: Container(
-                              height: MediaQuery.of(context).size.height,
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: StaggeredGrid.count(
-                              crossAxisCount: 9,
-                              crossAxisSpacing: 4,
-                              mainAxisSpacing: 4,
-                              children: [
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 0, title: '고요한강 협곡', mapInfo: AppData.mapData['hushed_river_valley'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 1,
-                                  mainAxisCellCount: 1,
-                                  child: Tile(index: 1, color: Colors.transparent),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 1,
-                                  mainAxisCellCount: 1,
-                                  child: Tile(index: 2, color: Colors.transparent),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 5, title: '블랙록', mapInfo: AppData.mapData['blackrock'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 1,
-                                  mainAxisCellCount: 1,
-                                  child: Tile(index: 0, color: Colors.transparent),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 6, title: '잿빛협곡', mapInfo: AppData.mapData['ash_canyon'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 1,
-                                  child: Tile(index: 3, title: '간수의 길목', mapInfo: AppData.mapData['keepers_pass'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 1,
-                                  mainAxisCellCount: 1,
-                                  child: Tile(index: 2, color: Colors.transparent),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 7, title: '마운틴 타운', mapInfo: AppData.mapData['mountain_town'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 8, title: '신비로운 호수', mapInfo: AppData.mapData['mystery_lake'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 3,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 9, title: '행복한 계곡', mapInfo: AppData.mapData['pleasant_valley'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 10, title: '팀버울프산', mapInfo: AppData.mapData['timberwolf_mountain'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 11, title: '쓸쓸한 들판', mapInfo: AppData.mapData['forlorn_muskeg'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 1,
-                                  mainAxisCellCount: 1,
-                                  child: Tile(index: 12, color: Colors.transparent),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 1,
-                                  mainAxisCellCount: 1,
-                                  child: Tile(index: 13, color: Colors.transparent),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 1,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 16, title: '굽이치는 강', mapInfo: AppData.mapData['winding_river'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 20, color: Colors.transparent),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 17, color: Colors.transparent),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 1,
-                                  child: Tile(index: 18, title: '산골짜기', mapInfo: AppData.mapData['ravine'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 21, title: '망가진 철도', mapInfo: AppData.mapData['broken_railroad'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 22, title: '블랙인랫', mapInfo: AppData.mapData['bleak_inlet'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 23, title: '해안 고속도로', mapInfo: AppData.mapData['coastal_highway'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 1,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 24, title: '무너저가는 고속도로', mapInfo: AppData.mapData['crumbling_highway'], onSelect: onMapSelected),
-                                ),
-                                StaggeredGridTile.count(
-                                  crossAxisCellCount: 2,
-                                  mainAxisCellCount: 2,
-                                  child: Tile(index: 25, title: '황량한 해안', mapInfo: AppData.mapData['desolation_point'], onSelect: onMapSelected),
-                                ),
-                              ],
-                            )
-                            )
-                          );
+                          return Center(
+                            child: GestureZoomBox(
+                              maxScale: 10.0,
+                              duration: Duration(milliseconds: 100),
+                              onScaleChanged: (scale) {
+                                // LOG('--> scale : $scale');
+                                setState(() {
+                                  controller.mapScale = scale;
+                                });
+                              },
+                              child: Container(
+                                height: MediaQuery.of(context).size.height,
+                              padding: EdgeInsets.fromLTRB(10, controller.mapScale * 10, 10, 10),
+                              child: StaggeredGrid.count(
+                                crossAxisCount: 9,
+                                crossAxisSpacing: 4,
+                                mainAxisSpacing: 4,
+                                children: [
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 0, title: '고요한강 협곡', mapInfo: AppData.mapData['hushed_river_valley'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 1,
+                                    mainAxisCellCount: 1,
+                                    child: IceTile(index: 1, color: Colors.transparent),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 1,
+                                    mainAxisCellCount: 1,
+                                    child: IceTile(index: 2, color: Colors.transparent),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 3, title: '블랙록', mapInfo: AppData.mapData['blackrock'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 1,
+                                    mainAxisCellCount: 1,
+                                    child: IceTile(index: 4, color: Colors.transparent),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 5, title: '잿빛협곡', mapInfo: AppData.mapData['ash_canyon'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 1,
+                                    child: IceTile(index: 6, title: '간수의 길목', mapInfo: AppData.mapData['keepers_pass'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 1,
+                                    mainAxisCellCount: 1,
+                                    child: IceTile(index: 7, color: Colors.transparent),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 8, title: '마운틴 타운', mapInfo: AppData.mapData['mountain_town'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 9, title: '신비로운 호수', mapInfo: AppData.mapData['mystery_lake'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 3,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 10, title: '행복한 계곡', mapInfo: AppData.mapData['pleasant_valley'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 11, title: '팀버울프산', mapInfo: AppData.mapData['timberwolf_mountain'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 12, title: '쓸쓸한 들판', mapInfo: AppData.mapData['forlorn_muskeg'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 1,
+                                    mainAxisCellCount: 1,
+                                    child: IceTile(index: 13, color: Colors.transparent),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 1,
+                                    mainAxisCellCount: 1,
+                                    child: IceTile(index: 14, color: Colors.transparent),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 1,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 15, title: '굽이치는 강', mapInfo: AppData.mapData['winding_river'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 16, color: Colors.transparent),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 17, color: Colors.transparent),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 1,
+                                    child: IceTile(index: 18, title: '산골짜기', mapInfo: AppData.mapData['ravine'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 19, title: '망가진 철도', mapInfo: AppData.mapData['broken_railroad'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 20, title: '블랙인랫', mapInfo: AppData.mapData['bleak_inlet'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 21, title: '해안 고속도로', mapInfo: AppData.mapData['coastal_highway'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 1,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 22, title: '무너저가는 고속도로', mapInfo: AppData.mapData['crumbling_highway'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 2,
+                                    child: IceTile(index: 23, title: '황량한 해안', mapInfo: AppData.mapData['desolation_point'], onSelect: onMapSelected),
+                                  ),
+                                ],
+                              )
+                              )
+                              )
+                            );
+                          } else {
+                            return Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: ListView(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                children: List<Widget>.of(AppData.mapData.entries.map((item) =>
+                                  mainListItem(item.value, () {
+                                    LOG('--> itemInfo : ${item.value}');
+                                    Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', item.value));
+                                  })
+                                )).toList(),
+                              )
+                            );
+                          }
                         } else {
-                          return ListView(
-                            children: List<Widget>.of(AppData.mapData.entries.map((item) =>
-                              mainListItem(item.value, () {
-                                LOG('--> itemInfo : ${item.value}');
-                                Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', item.value));
-                              })
-                            )).toList(),
+                          return Container(
+                            child: Center(
+                              child: Text('no map data'),
+                            ),
                           );
                         }
                       } else {
-                        return Container(
-                          child: Center(
-                            child: Text('no map data'),
-                          ),
-                        );
+                        return CircularProgressIndicator();
                       }
-                    } else {
-                      return CircularProgressIndicator();
                     }
-                  }
-                ),
+                  ),
               )
             );
           }

@@ -31,6 +31,8 @@ class MapScreenController extends GetxController {
   var pinSize = 5.0;
   var isDragOn = '';
   var mapScale = 1.0;
+  var isLinkEditOn = false;
+  JSON linkEditInfo = {};
 
   @override
   void onInit() {
@@ -212,7 +214,7 @@ class MapScreenController extends GetxController {
                     //   child: Text(STR(item['title']), style: pinTitleStyle),
                     Stack(
                       children: [
-                        Icon(GameIcons[iconIndex], size: pinSize+1, color: Colors.black),
+                        Icon(Icons.circle, size: pinSize+1, color: Colors.black),
                         Positioned(
                           left: 0.5,
                           top: 0.5,
@@ -225,7 +227,7 @@ class MapScreenController extends GetxController {
               )
             ]
           ],
-          if (STR(item['icon']).isEmpty)...[
+          if (STR(item.icon).isEmpty)...[
             BottomCenterAlign(
               child: Icon(Icons.circle, size: pinSize * 0.2, color: isDragOn ? Colors.red : COL(item['color'])),
             ),
@@ -258,14 +260,59 @@ class MapScreenController extends GetxController {
     return false;
   }
 
-  searchPinPoint(double x, double y) {
-    for (var item in AppData.pinData[targetId]['data']) {
-      if (item.dx - offset <= x && item.dx + offset >= x &&
-          item.dy - offset <= y && item.dy + offset >= y) {
-        LOG('--> find point [$x, $y] : $item');
-        return item;
+  List<Widget> getLinkListWidget() {
+    List<Widget> result = [];
+    for (var item in AppData.linkData.entries) {
+      LOG('--> getLinkListWidget item : $targetId / ${item.value['targetId']}');
+      if (item.value['targetId'] == targetId) {
+        result.add(
+          Positioned(
+            top: DBL(item.value['sy']),
+            left: DBL(item.value['sx']),
+            child: Container(
+              width: DBL(item.value['ex']) - DBL(item.value['sx']),
+              height: DBL(item.value['ey']) - DBL(item.value['sy']),
+              color: Colors.black45,
+            ),
+          )
+        );
+      }
+    }
+    LOG('--> getLinkListWidget result : ${result.length}');
+    return result;
+  }
+
+  getLinkEditInfo(detail) {
+    var x = detail.localPosition.dx;
+    var y = detail.localPosition.dy;
+    for (var item in AppData.linkData.entries) {
+      LOG('--> linkData item [$targetId] : ${item.value['targetId']} - $x, $y / ${item.value['sx']},${item.value['sy']} x ${item.value['ex']},${item.value['ey']}');
+      if (item.value['targetId'] == targetId &&
+          item.value['sx'] <= x && item.value['ex'] >= x &&
+          item.value['sy'] <= y && item.value['ey'] >= y) {
+        var linkId = item.value['linkId'];
+        LOG('--> getLinkEditInfo found [$x, $y] : ${item.value['id']} => $linkId');
+        return AppData.mapData[linkId] ?? AppData.mapLinkData[linkId];
       }
     }
     return null;
+  }
+
+  addLinkEditInfo(context, detail, onUpdate) {
+    showLinkSelectDialog(context, targetId, isAll: true).then((result) {
+      LOG('--> result : $result');
+      if (result != null) {
+        linkEditInfo['ex'] = detail.localPosition.dx;
+        linkEditInfo['ey'] = detail.localPosition.dy;
+        linkEditInfo['targetId'] = targetId;
+        linkEditInfo['linkId']   = result['id'];
+        api.addLinkData(linkEditInfo).then((addResult) {
+          if (addResult != null) {
+            AppData.linkData[addResult['id']] = addResult;
+            onUpdate();
+          }
+        });
+      }
+    });
   }
 }

@@ -12,9 +12,11 @@ class AppData {
   static JSON mapLinkData = {};
   static JSON mapInsideData = {};
   static JSON pinData = {};
+  static JSON linkData = {};
   static JSON listSelectData = {};
 
   static bool isPinShow = true;
+  static bool isEditMode = true;
 }
 
 const GameIcons = [

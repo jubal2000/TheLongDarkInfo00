@@ -27,7 +27,7 @@ Widget mainListItem(JSON itemInfo, [Function()? onSelect]) {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             if (STR(itemInfo['icon']).isNotEmpty)...[
-              showImage('assets/icons/game/${STR(itemInfo['icon'])}.png', Size(40, 40), NAVY),
+              showImage('assets/icons/game/${STR(itemInfo['icon'])}.png', Size(40, 40), NAVY.shade300),
               SizedBox(width: 10),
             ],
             Expanded(

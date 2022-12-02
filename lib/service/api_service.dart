@@ -67,6 +67,12 @@ class ApiService extends GetxService {
     }
   }
 
+  Future<dynamic> getMapLinkDataAll() async {
+    var result1 = await getMapLinkData();
+    var result2 = await getMapInsideData();
+    return result2;
+  }
+
   Future<dynamic> getMapLinkData() async {
     if (JSON_NOT_EMPTY(AppData.mapLinkData)) return AppData.mapLinkData;
     try {
@@ -116,8 +122,7 @@ class ApiService extends GetxService {
   // pin data..
   final PinCollection = 'data_pin';
 
-  Future<JSON> addPinData(JSON addItem) async {
-    JSON result = {};
+  Future<JSON?> addPinData(JSON addItem) async {
     try {
       var dataRef = firebase.firestore!.collection(PinCollection);
       var key = STR(addItem['id']).toString();
@@ -130,10 +135,60 @@ class ApiService extends GetxService {
       addItem['updateTime'] = CURRENT_SERVER_TIME();
       await dataRef.doc(key).set(Map<String, dynamic>.from(addItem));
       var result = FROM_SERVER_DATA(addItem);
+      return result;
     } catch (e) {
       LOG('--> addPinData : $e');
     }
-    return result;
+    return null;
   }
+
+  // pin data..
+  final LinkCollection = 'data_link';
+
+  Future<dynamic> getLinkData() async {
+    if (JSON_NOT_EMPTY(AppData.linkData)) return AppData.linkData;
+    try {
+      var collectionRef = firebase.firestore!.collection(LinkCollection);
+      var querySnapshot = await collectionRef
+          .where('status', isEqualTo: 1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (var doc in querySnapshot.docs) {
+          AppData.linkData[doc.data()['id']] = FROM_SERVER_DATA(doc.data());
+          // LOG('--> resultData [${outName[i]}]: ${doc.data()}');
+        }
+        LOG('--> getLinkData result : ${AppData.linkData}');
+        return AppData.linkData;
+      } else {
+        LOG('--> getLinkData : no data');
+        return {'error' : 'no data'};
+      }
+    } catch (e) {
+      LOG('--> getLinkData Error : $e');
+      return {'error' : e.toString()};
+    }
+  }
+
+  Future<JSON?> addLinkData(JSON addItem) async {
+    try {
+      var dataRef = firebase.firestore!.collection(LinkCollection);
+      var key = STR(addItem['id']).toString();
+      if (key.isEmpty) {
+        key = dataRef.doc().id;
+        addItem['id'] = key;
+        addItem['status'] = 1;
+        addItem['createTime'] = CURRENT_SERVER_TIME();
+      }
+      addItem['updateTime'] = CURRENT_SERVER_TIME();
+      await dataRef.doc(key).set(Map<String, dynamic>.from(addItem));
+      var result = FROM_SERVER_DATA(addItem);
+      return result;
+    } catch (e) {
+      LOG('--> addLinkData : $e');
+    }
+    return null;
+  }
+
 }
 

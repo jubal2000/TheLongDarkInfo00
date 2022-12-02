@@ -21,119 +21,152 @@ import 'map_screen_controller.dart';
 
 class MapScreen extends GetView<MapScreenController> {
   MapScreen({Key? key}) : super(key: key);
+  final api = Get.find<ApiService>();
 
   @override
   Widget build(BuildContext context) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return SafeArea(
-          top: false,
-          child: Scaffold(
-            appBar: AppBar(
-              title: Text(STR(controller.targetInfo['title_kr'])),
-              titleSpacing: 0,
-              toolbarHeight: top_height,
-            ),
-            body: GestureZoomBox(
-              maxScale: 10.0,
-              duration: Duration(milliseconds: 100),
-              onScaleChanged: (scale) {
-                // LOG('--> scale : $scale');
-                controller.mapScale = scale;
-              },
-              child: Center(
-                child: Stack(
-                  children: [
-                    GestureDetector(
-                      onTapUp: (detail) {
-                        LOG('--> detail : ${detail.localPosition}');
-                        controller.onImageTap(context, detail).then((result) {
+    return FutureBuilder(
+      future: api.getLinkData(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return SafeArea(
+                  top: false,
+                  child: Scaffold(
+                    appBar: AppBar(
+                      title: Text(STR(controller.targetInfo['title_kr'])),
+                      titleSpacing: 0,
+                      toolbarHeight: top_height,
+                    ),
+                    body: GestureZoomBox(
+                      maxScale: 10.0,
+                      duration: Duration(milliseconds: 100),
+                      onScaleChanged: (scale) {
+                        // LOG('--> scale : $scale');
+                        controller.mapScale = scale;
+                      },
+                      child: Center(
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                              onTapUp: (detail) {
+                                var linkInfo = controller.getLinkEditInfo(detail);
+                                if (linkInfo == null) {
+                                  if (AppData.isEditMode) {
+                                    if (!controller.isLinkEditOn) {
+                                      controller.linkEditInfo['sx'] = detail.localPosition.dx;
+                                      controller.linkEditInfo['sy'] = detail.localPosition.dy;
+                                      controller.isLinkEditOn = true;
+                                    } else {
+                                      controller.isLinkEditOn = false;
+                                      controller.addLinkEditInfo(context, detail, () {
+                                        setState((){});
+                                      });
+                                    }
+                                  }
+                                } else {
+                                  setState(() {
+                                    controller.targetInfo = linkInfo;
+                                    controller.targetId   = linkInfo['id'] ?? 'id_none';
+                                  });
+                                }
+                              },
+                              onLongPressStart: (detail) {
+                                LOG('--> detail : ${detail.localPosition}');
+                                controller.onImageTap(context, detail).then((result) {
+                                  setState(() {
+                                  });
+                                });
+                              },
+                              child: showImageFit(STR(controller.targetInfo['map_full'])),
+                            ),
+                            ...controller.getPinListWidget(context, () {
+                              setState(() {
+                              });
+                            }),
+                            ...controller.getLinkListWidget()
+                          ],
+                        ),
+                    // children: [
+                      // PhotoView(
+                      //   controller: controller.photoViewController,
+                      //   imageProvider: NetworkImage(STR(controller.targetInfo['map_full'])),
+                      //   enableRotation: !AppData.isRotateLock,
+                      //   backgroundDecoration: BoxDecoration(
+                      //     color: Colors.white
+                      //   ),
+                      //   onTapUp: (context, detail, value) {
+                      //     controller.onImageTap(context, detail, value).then((result) {
+                      //       setState(() {
+                      //       });
+                      //     });
+                      //   },
+                      //   onScaleEnd: (context, detail, value) {
+                      //     setState(() {
+                      //
+                      //     });
+                      //   },
+                      // ),
+                    // ]
+                    )
+                  ),
+                  floatingActionButton: FabCircularMenu(
+                    fabOpenIcon: Icon(Icons.menu, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
+                    fabCloseIcon: Icon(Icons.close, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
+                    fabMargin: EdgeInsets.all(15),
+                    fabSize: 55,
+                    fabColor: Theme.of(context).primaryColor,
+                    ringColor: Theme.of(context).primaryColor.withOpacity(0.2),
+                    ringDiameter: 280,
+                    ringWidth: 60,
+                    children: <Widget>[
+                      mainMenu(Icons.share, 'LINK'.tr, () {
+                        showLinkSelectDialog(context, controller.targetId).then((itemInfo) {
+                          LOG('--> itemInfo : $itemInfo');
+                          if (itemInfo != null) {
+                            setState(() {
+                              controller.targetInfo = itemInfo;
+                              controller.targetId = itemInfo['id'] ?? 'id_none';
+                            });
+                            // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
+                          }
+                        });
+                      }, Theme.of(context).colorScheme.secondaryContainer),
+                      if (AppData.mapData[controller.targetId] != null && LIST_NOT_EMPTY(AppData.mapData[controller.targetId]['insideData']))
+                        mainMenu(Icons.star_border, 'OBJECT'.tr, () {
+                          showLinkSelectDialog(context, controller.targetId, isInside: true).then((itemInfo) {
+                            LOG('--> itemInfo : $itemInfo');
+                            if (itemInfo != null) {
+                              setState(() {
+                                controller.targetInfo = itemInfo;
+                                controller.targetId = itemInfo['id'] ?? 'id_none';
+                              });
+                              // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
+                            }
+                          });
+                        }, Theme.of(context).colorScheme.secondaryContainer),
+                      mainMenu(Icons.cleaning_services_outlined, 'CLEAR'.tr, () {
+                        controller.clearPinMark(context).then((result) {
                           setState(() {
                           });
                         });
-                      },
-                      child: showImageFit(STR(controller.targetInfo['map_full'])),
-                    ),
-                    ...controller.getPinListWidget(context, () {
-                      setState(() {
-                      });
-                    }),
-                  ],
-                ),
-              // children: [
-                // PhotoView(
-                //   controller: controller.photoViewController,
-                //   imageProvider: NetworkImage(STR(controller.targetInfo['map_full'])),
-                //   enableRotation: !AppData.isRotateLock,
-                //   backgroundDecoration: BoxDecoration(
-                //     color: Colors.white
-                //   ),
-                //   onTapUp: (context, detail, value) {
-                //     controller.onImageTap(context, detail, value).then((result) {
-                //       setState(() {
-                //       });
-                //     });
-                //   },
-                //   onScaleEnd: (context, detail, value) {
-                //     setState(() {
-                //
-                //     });
-                //   },
-                // ),
-              // ]
-            )
-            ),
-            floatingActionButton: FabCircularMenu(
-              fabOpenIcon: Icon(Icons.menu, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
-              fabCloseIcon: Icon(Icons.close, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
-              fabMargin: EdgeInsets.all(15),
-              fabSize: 55,
-              fabColor: Theme.of(context).primaryColor,
-              ringColor: Theme.of(context).primaryColor.withOpacity(0.2),
-              ringDiameter: 280,
-              ringWidth: 60,
-              children: <Widget>[
-                mainMenu(Icons.share, 'LINK'.tr, () {
-                  showLinkSelectDialog(context, controller.targetId).then((itemInfo) {
-                    LOG('--> itemInfo : $itemInfo');
-                    if (itemInfo != null) {
-                      setState(() {
-                        controller.targetInfo = itemInfo;
-                        controller.targetId = itemInfo['id'] ?? 'id_none';
-                      });
-                      // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
-                    }
-                  });
-                }, Theme.of(context).colorScheme.secondaryContainer),
-                if (AppData.mapData[controller.targetId] != null && LIST_NOT_EMPTY(AppData.mapData[controller.targetId]['insideData']))
-                  mainMenu(Icons.star_border, 'OBJECT'.tr, () {
-                    showLinkSelectDialog(context, controller.targetId, isInside: true).then((itemInfo) {
-                      LOG('--> itemInfo : $itemInfo');
-                      if (itemInfo != null) {
+                      }, Theme.of(context).colorScheme.secondaryContainer),
+                      mainMenu(AppData.isPinShow ? Icons.visibility_outlined : Icons.visibility_off_outlined, AppData.isPinShow ? 'SHOW'.tr : 'HIDE'.tr, () {
                         setState(() {
-                          controller.targetInfo = itemInfo;
-                          controller.targetId = itemInfo['id'] ?? 'id_none';
+                          AppData.isPinShow = !AppData.isPinShow;
+                          // controller.photoViewController.reset();
                         });
-                        // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
-                      }
-                    });
-                  }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(Icons.cleaning_services_outlined, 'CLEAR'.tr, () {
-                  controller.clearPinMark(context).then((result) {
-                    setState(() {
-                    });
-                  });
-                }, Theme.of(context).colorScheme.secondaryContainer),
-                mainMenu(AppData.isPinShow ? Icons.visibility_outlined : Icons.visibility_off_outlined, AppData.isPinShow ? 'SHOW'.tr : 'HIDE'.tr, () {
-                  setState(() {
-                    AppData.isPinShow = !AppData.isPinShow;
-                    // controller.photoViewController.reset();
-                  });
-                }, Theme.of(context).colorScheme.secondaryContainer),
-              ]
-            ),
-          )
-        );
+                      }, Theme.of(context).colorScheme.secondaryContainer),
+                    ]
+                  ),
+                )
+              );
+            }
+          );
+        } else {
+          return showLoadingCircleSquare(50);
+        }
       }
     );
   }
