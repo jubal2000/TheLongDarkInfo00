@@ -25,6 +25,8 @@ TextStyle dialogDescTextErrorStyle = TextStyle(
 // item..
 TextStyle itemTitleStyle = TextStyle(
     fontSize: item_title_font_size, color: NAVY, fontWeight: FontWeight.w700);
+TextStyle itemTitleInverseStyle = TextStyle(
+    fontSize: item_title_font_size, color: Colors.white, fontWeight: FontWeight.w700);
 TextStyle itemTitleInfoStyle = TextStyle(
     fontSize: item_title_info_font_size, color: Colors.black38, fontWeight: FontWeight.w700);
 TextStyle itemTitleAlertStyle = TextStyle(

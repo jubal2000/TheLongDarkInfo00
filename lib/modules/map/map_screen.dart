@@ -39,56 +39,65 @@ class MapScreen extends GetView<MapScreenController> {
                       titleSpacing: 0,
                       toolbarHeight: top_height,
                     ),
-                    body: GestureZoomBox(
+                    body: Stack(
+                        children: [
+                          GestureZoomBox(
                       maxScale: 10.0,
                       duration: Duration(milliseconds: 100),
                       onScaleChanged: (scale) {
                         // LOG('--> scale : $scale');
                         controller.mapScale = scale;
                       },
-                      child: Center(
-                        child: Stack(
-                          children: [
-                            GestureDetector(
-                              onTapUp: (detail) {
-                                var linkInfo = controller.getLinkEditInfo(detail);
-                                if (linkInfo == null) {
-                                  if (AppData.isEditMode) {
-                                    if (!controller.isLinkEditOn) {
-                                      controller.linkEditInfo['sx'] = detail.localPosition.dx;
-                                      controller.linkEditInfo['sy'] = detail.localPosition.dy;
-                                      controller.isLinkEditOn = true;
-                                    } else {
-                                      controller.isLinkEditOn = false;
-                                      controller.addLinkEditInfo(context, detail, () {
-                                        setState((){});
-                                      });
+                      child:
+                          Stack(
+                            children: [
+                              GestureDetector(
+                                onTapUp: (detail) {
+                                  var linkInfo = controller.getLinkEditInfo(detail);
+                                  if (linkInfo == null) {
+                                    if (AppData.isEditMode) {
+                                      if (controller.linkEditStep == 0) {
+                                        controller.linkEditInfo['sx'] = detail.localPosition.dx;
+                                        controller.linkEditInfo['sy'] = detail.localPosition.dy;
+                                        controller.linkEditStep++;
+                                      } else {
+                                        setState(() {
+                                          controller.linkEditInfo['ex'] = detail.localPosition.dx;
+                                          controller.linkEditInfo['ey'] = detail.localPosition.dy;
+                                          controller.linkEditStep++;
+                                          // controller.addLinkEditInfo(context, detail, () {
+                                          //   setState((){});
+                                          // });
+                                        });
+                                      }
                                     }
+                                  } else {
+                                    setState(() {
+                                      controller.targetInfo = linkInfo;
+                                      controller.targetId   = linkInfo['id'] ?? 'id_none';
+                                    });
                                   }
-                                } else {
-                                  setState(() {
-                                    controller.targetInfo = linkInfo;
-                                    controller.targetId   = linkInfo['id'] ?? 'id_none';
+                                },
+                                onLongPressStart: (detail) {
+                                  LOG('--> detail : ${detail.localPosition}');
+                                  controller.onImageTap(context, detail).then((result) {
+                                    setState(() {
+                                    });
                                   });
-                                }
-                              },
-                              onLongPressStart: (detail) {
-                                LOG('--> detail : ${detail.localPosition}');
-                                controller.onImageTap(context, detail).then((result) {
-                                  setState(() {
-                                  });
+                                },
+                                child: showImageFit(STR(controller.targetInfo['map_full'])),
+                              ),
+                              ...controller.getPinListWidget(context, () {
+                                setState(() {
                                 });
-                              },
-                              child: showImageFit(STR(controller.targetInfo['map_full'])),
-                            ),
-                            ...controller.getPinListWidget(context, () {
-                              setState(() {
-                              });
-                            }),
-                            ...controller.getLinkListWidget()
-                          ],
-                        ),
-                    // children: [
+                              }),
+                              ...controller.getLinkListWidget(),
+                              if (controller.linkEditStep == 2)...[
+                                controller.showLinkListMark(controller.linkEditInfo),
+                              ]
+                            ],
+                          ),
+                          // children: [
                       // PhotoView(
                       //   controller: controller.photoViewController,
                       //   imageProvider: NetworkImage(STR(controller.targetInfo['map_full'])),
@@ -109,7 +118,42 @@ class MapScreen extends GetView<MapScreenController> {
                       //   },
                       // ),
                     // ]
-                    )
+                      ),
+                      if (AppData.isEditMode && controller.linkEditStep == 2)...[
+                        BottomCenterAlign(
+                          child: Container(
+                            width: 300,
+                            padding: EdgeInsets.all(20),
+                            child: Row(
+                              children: [
+                                RoundedButton(
+                                  backgroundColor: Colors.indigo,
+                                  onPressed: () {
+                                    controller.addLinkEditInfo(context, () {
+                                      setState((){
+                                        controller.linkEditStep = 0;
+                                      });
+                                    });
+                                  },
+                                  label: 'Upload mark',
+                                ),
+                                RoundedButton(
+                                  backgroundColor: Colors.grey,
+                                  onPressed: () {
+                                    controller.addLinkEditInfo(context, () {
+                                      setState((){
+                                        controller.linkEditStep = 0;
+                                      });
+                                    });
+                                  },
+                                  label: 'X',
+                                )
+                              ]
+                            )
+                          )
+                        )
+                      ],
+                    ]
                   ),
                   floatingActionButton: FabCircularMenu(
                     fabOpenIcon: Icon(Icons.menu, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),

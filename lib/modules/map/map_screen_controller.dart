@@ -31,7 +31,7 @@ class MapScreenController extends GetxController {
   var pinSize = 5.0;
   var isDragOn = '';
   var mapScale = 1.0;
-  var isLinkEditOn = false;
+  var linkEditStep = 0;
   JSON linkEditInfo = {};
 
   @override
@@ -265,21 +265,23 @@ class MapScreenController extends GetxController {
     for (var item in AppData.linkData.entries) {
       LOG('--> getLinkListWidget item : $targetId / ${item.value['targetId']}');
       if (item.value['targetId'] == targetId) {
-        result.add(
-          Positioned(
-            top: DBL(item.value['sy']),
-            left: DBL(item.value['sx']),
-            child: Container(
-              width: DBL(item.value['ex']) - DBL(item.value['sx']),
-              height: DBL(item.value['ey']) - DBL(item.value['sy']),
-              color: Colors.black45,
-            ),
-          )
-        );
+        result.add(showLinkListMark(item.value));
       }
     }
     LOG('--> getLinkListWidget result : ${result.length}');
     return result;
+  }
+
+  showLinkListMark(item, [bool isEditMode = false]) {
+    return Positioned(
+      top: DBL(item['sy']),
+      left: DBL(item['sx']),
+      child: Container(
+        width: DBL(item['ex']) - DBL(item['sx']),
+        height: DBL(item['ey']) - DBL(item['sy']),
+        color: Colors.black45,
+      ),
+    );
   }
 
   getLinkEditInfo(detail) {
@@ -298,12 +300,10 @@ class MapScreenController extends GetxController {
     return null;
   }
 
-  addLinkEditInfo(context, detail, onUpdate) {
+  addLinkEditInfo(context, onUpdate) {
     showLinkSelectDialog(context, targetId, isAll: true).then((result) {
       LOG('--> result : $result');
       if (result != null) {
-        linkEditInfo['ex'] = detail.localPosition.dx;
-        linkEditInfo['ey'] = detail.localPosition.dy;
         linkEditInfo['targetId'] = targetId;
         linkEditInfo['linkId']   = result['id'];
         api.addLinkData(linkEditInfo).then((addResult) {
