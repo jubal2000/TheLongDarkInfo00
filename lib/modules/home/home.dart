@@ -58,7 +58,7 @@ class Home extends GetView<HomeController> {
               appBar: AppBar(
                 title: Row(
                   children: [
-                    showImage('assets/icons/app_icon_00.png', Size(24,24), Colors.black54),
+                    showImage('assets/icons/app_icon_01.png', Size(24,24)),
                     SizedBox(width: 5),
                     Text(
                       'app_title'.tr,

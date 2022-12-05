@@ -838,25 +838,23 @@ List<Widget> getLinkList(String targetId, Function(JSON) onSelect) {
   if (AppData.mapLinkData[targetId] != null) {
     for (var link in AppData.mapLinkData[targetId]['linkData']) {
       var item = AppData.mapData[link];
-      if (item != null) {
-        if (!checkList.contains(item['id'])) {
-          LOG('--> add 1 : ${item['title']}');
-          checkList.add(item['id']);
-          result.add(
-              mainListItem(item, () {
-                onSelect(item);
-              })
-          );
-        }
+      if (item != null && !checkList.contains(item['id'])) {
+        LOG('--> add 1 : ${item['title']}');
+        checkList.add(item['id']);
+        result.add(
+            mainListItem(item, () {
+              onSelect(item);
+            })
+        );
       }
     }
   }
 
   if (AppData.mapInsideData[targetId] != null) {
-    for (var link in AppData.mapInsideData[targetId]['linkData']) {
-      var item = AppData.mapData[link];
-      if (item != null) {
-        if (!checkList.contains(item['id'])) {
+    if (LIST_NOT_EMPTY(AppData.mapInsideData[targetId]['linkData'])) {
+      for (var link in AppData.mapInsideData[targetId]['linkData']) {
+        var item = AppData.mapData[link];
+        if (item != null && !checkList.contains(item['id'])) {
           LOG('--> add 2 : ${item['title']}');
           checkList.add(item['id']);
           result.add(
@@ -869,13 +867,28 @@ List<Widget> getLinkList(String targetId, Function(JSON) onSelect) {
     }
   }
 
+  for (var item in AppData.mapInsideData.entries) {
+    if (LIST_NOT_EMPTY(item.value['linkData'])) {
+      for (var link in item.value['linkData']) {
+        if (link == targetId && !checkList.contains(item.key)) {
+          LOG('--> add 3 : ${item.value['title']}');
+          checkList.add(item.key);
+          result.add(
+              mainListItem(item.value, () {
+                onSelect(item.value);
+              })
+          );
+        }
+      }
+    }
+  }
+
   for (var item in AppData.mapLinkData.entries) {
     if (LIST_NOT_EMPTY(item.value['linkData'])) {
       for (var link in item.value['linkData']) {
         if (link == targetId && !checkList.contains(item.key)) {
-          var newItem = getMapLinkTitle(item.value, STR(AppData.mapData[targetId]['title']));
-          LOG('--> add 3 : ${newItem['title']} / ${newItem['titleEx']}');
-          newItem['type'] = 1;
+          var newItem = getMapLinkTitle(item.value, AppData.mapData[targetId] != null ? STR(AppData.mapData[targetId]['title']) : STR(AppData.mapInsideData[targetId]['title']));
+          LOG('--> add 4 : ${newItem['title']} / ${newItem['titleEx']}');
           checkList.add(item.key);
           result.add(
             mainListItem(newItem, () {

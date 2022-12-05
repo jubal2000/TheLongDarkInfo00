@@ -287,12 +287,12 @@ class MapScreenController extends GetxController {
   List<Widget> getLinkListWidget(Function()? onSelected) {
     List<Widget> result = [];
     for (var item in AppData.linkData.entries) {
-      LOG('--> getLinkListWidget item : $targetId / ${item.value['targetId']}');
+      // LOG('--> getLinkListWidget item : $targetId / ${item.value['targetId']}');
       if (item.value['targetId'] == targetId) {
         result.add(showLinkListMark(item.value, onSelected, false, AppData.isEditMode));
       }
     }
-    LOG('--> getLinkListWidget result : ${result.length}');
+    // LOG('--> getLinkListWidget result : ${result.length}');
     return result;
   }
 
@@ -320,7 +320,7 @@ class MapScreenController extends GetxController {
           onTap: () {
             var linkId = item['linkId'];
             LOG('--> link touched : $linkId');
-            var targetInfo = AppData.mapData[linkId] ?? AppData.mapLinkData[linkId];
+            var targetInfo = AppData.mapData[linkId] ?? AppData.mapLinkData[linkId] ?? AppData.mapInsideData[linkId];
             if (targetInfo != null) {
               addTargetInfo(targetInfo);
               if (onSelected != null) onSelected();
@@ -331,7 +331,12 @@ class MapScreenController extends GetxController {
             height: DBL(item['ey']) - DBL(item['sy']),
             color: isAddMode ? Colors.green.withOpacity(0.75) : isEditMode ? Colors.black45 : Colors.black12,
             child: Center(
-              child: isEditMode ? Text(STR(item['linkTitle_kr']), style: pinEditTitleStyle) : Container(),
+              child: Column(
+                children: [
+                  isAddMode || isEditMode ? Text(STR(item['linkTitle_kr']), style: pinEditTitleStyle) : Container(),
+                  isEditMode ? Text(STR(item['id']).toString().substring(0, 3), style: pinEditTitleStyle) : Container(),
+                ]
+              )
             )
           ),
         ),

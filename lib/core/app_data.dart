@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:the_long_dark_info/core/utils.dart';
 
 const SCROLL_SPEED = 250;
+const APP_VERSION = '0.0.1';
 
 class AppData {
   static final AppData _singleton = AppData._internal();

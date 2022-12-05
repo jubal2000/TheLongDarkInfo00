@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:get/get.dart';
 import 'package:store_redirect/store_redirect.dart';
 import 'package:the_long_dark_info/service/local_service.dart';
+import '../../core/app_data.dart';
 import '../../core/utils.dart';
 import '../../service/api_service.dart';
 
@@ -27,17 +28,17 @@ class IntroController extends GetxController {
     LOG('--> checkAppUpdate : $serverVersionData');
 
     // check version from server..
-    final version = await StorageManager.readData('appVersion');
-    final versionData = serverVersionData['appVersion'];
+    final versionLocal = await StorageManager.readData('appVersion');
+    final versionData  = serverVersionData['appVersion'];
     if (versionData != null) {
       final versionInfo = Platform.isAndroid ? versionData['android'] : versionData['ios'];
       final isForceUpdate = versionInfo['update'].toLowerCase() == 'y';
       // final version = ''; // for Dev..
-      LOG('--> version : $isForceUpdate / $version / ${versionInfo['version']}');
-      if (isForceUpdate || version == null || checkVersionString(version.toString(), STR(versionInfo['version']))) {
+      LOG('--> version : $isForceUpdate / $versionLocal / ${versionInfo['version']}');
+      if (isForceUpdate || checkVersionString(APP_VERSION, STR(versionInfo['version']), versionLocal ?? '')) {
         var dlgResult = await showAppUpdateDialog(context,
           STR(versionInfo['message']),
-          'version: ${STR(versionInfo['version'])}',
+          '$APP_VERSION > ${STR(versionInfo['version'])}',
           isForceUpdate: isForceUpdate,
         );
         LOG('--> showAppUpdateDialog result : $dlgResult');
@@ -57,12 +58,28 @@ class IntroController extends GetxController {
     return true;
   }
 
-  checkVersionString(String source, String target) {
+  getNumberFromVersion(String version) {
+    var offsetN = [10000, 100, 1];
+    var result = 0;
+    var arr = version.split('.');
+    for (var i=0; i<arr.length; i++) {
+      try {
+        var value = int.parse(arr[i]);
+        result += value * offsetN[i];
+        LOG('--> [$i] : $value * ${offsetN[i]}');
+      } catch (e) {
+        LOG('--> getNumberFromVersion error : $e');
+      }
+    }
+    return result;
+  }
+
+  checkVersionString(String source, String target, String local) {
     try {
-    var source2 = int.parse(source.replaceAll('.', '0'));
-    var target2 = int.parse(target.replaceAll('.', '0'));
-    LOG('--> checkVersionString : $source2 / $target2 - $source / $target');
-    return source2 < target2;
+      var source2 = getNumberFromVersion(source);
+      var target2 = getNumberFromVersion(target);
+      LOG('--> checkVersionString : $source2 / $target2 - $source / $target / $local');
+      return local != target && source2 < target2;
     } catch (e) {
       LOG('--> error : $e');
     }
@@ -94,14 +111,14 @@ class IntroController extends GetxController {
           child: ListView(
             shrinkWrap: true,
             children: [
-              Image(image: AssetImage('assets/icons/app_icon_00.png'), height: 80, fit: BoxFit.fitHeight, color: Colors.black54),
+              Image(image: AssetImage('assets/icons/app_icon_01.png'), height: 80, fit: BoxFit.fitHeight),
               SizedBox(height: 20),
               Container(
                 width: double.infinity,
                 alignment: Alignment.center,
                 child: Text(
                   desc,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, height: 1.1),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, height: 1.5),
                   textAlign: TextAlign.center,
                 ),
               ),

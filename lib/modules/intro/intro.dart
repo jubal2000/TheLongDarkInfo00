@@ -24,7 +24,7 @@ class Intro extends GetView<IntroController> {
             child: FutureBuilder(
             future: api.getAppStartInfo(),
             builder: (context, snapshot) {
-              print('--> snapshot : ${snapshot.hasData} / ${controller.isCanStart}');
+              LOG('--> snapshot : ${snapshot.hasData} / ${controller.isCanStart}');
               if (snapshot.hasData) {
                 return StatefulBuilder(
                   builder: (context, setState) {
@@ -32,7 +32,7 @@ class Intro extends GetView<IntroController> {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         Future.delayed(const Duration(milliseconds: 500), () async {
                           var result = await controller.checkAppUpdate(context, AppData.startData);
-                          print('--> checkAppUpdate result : $result');
+                          LOG('--> checkAppUpdate result : $result');
                           if (result) {
                             setState(() {
                               controller.isCanStart = true;
@@ -49,9 +49,10 @@ class Intro extends GetView<IntroController> {
                               'assets/ui/app_logo_01.png',
                               width: MediaQuery.of(context).size.width * 0.8,
                               color: Colors.black54,
-                            )),
+                            )
+                        ),
                         Align(
-                          alignment: Alignment(0, 0.5),
+                          alignment: Alignment(0, 0.65),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             // crossAxisAlignment: CrossAxisAlignment.end,
@@ -75,17 +76,21 @@ class Intro extends GetView<IntroController> {
                             ],
                           ),
                         ),
-                        ],
-                      );
-                    }
-                  );
-                } else {
-                  return CircularProgressIndicator();
-                }
+                        Align(
+                          alignment: Alignment(0, 0.95),
+                          child: Text('Version $APP_VERSION\nApp created by JH.Factory\nMapped by stmSantana', textAlign: TextAlign.center),
+                        )
+                      ],
+                    );
+                  }
+                );
+              } else {
+                return CircularProgressIndicator();
               }
-            )
-          ),
+            }
+          )
         ),
+      ),
     );
   }
 }

@@ -89,8 +89,7 @@ class MapScreen extends GetView<MapScreenController> {
                           ),
                         ],
                       ),
-                      body: Container(
-                        child: Stack(
+                      body: Stack(
                           children: [
                             GestureZoomBox(
                               key: controller.zoomKey,
@@ -106,6 +105,7 @@ class MapScreen extends GetView<MapScreenController> {
                                 height: double.infinity,
                                 color: Colors.transparent,
                                 alignment: Alignment.center,
+                                padding: EdgeInsets.only(bottom: 60),
                                 child: Stack(
                                   children: [
                                     GestureDetector(
@@ -217,7 +217,6 @@ class MapScreen extends GetView<MapScreenController> {
                             )
                           ],
                         ]
-                      )
                     ),
                     floatingActionButton: FabCircularMenu(
                       fabOpenIcon: Icon(Icons.menu, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
@@ -241,19 +240,19 @@ class MapScreen extends GetView<MapScreenController> {
                             }
                           });
                         }, Theme.of(context).colorScheme.secondaryContainer),
-                        if (AppData.mapData[controller.targetId] != null && LIST_NOT_EMPTY(AppData.mapData[controller.targetId]['insideData']))
-                          mainMenu(Icons.star_border, 'OBJECT'.tr, () {
-                            showLinkSelectDialog(context, controller.targetId, isInside: true).then((itemInfo) {
-                              LOG('--> itemInfo : $itemInfo');
-                              if (itemInfo != null) {
-                                setState(() {
-                                  controller.targetInfo = itemInfo;
-                                  controller.targetId = itemInfo['id'] ?? 'id_none';
-                                });
-                                // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
-                              }
-                            });
-                          }, Theme.of(context).colorScheme.secondaryContainer),
+                        // if (AppData.mapData[controller.targetId] != null && LIST_NOT_EMPTY(AppData.mapData[controller.targetId]['insideData']))
+                        //   mainMenu(Icons.star_border, 'OBJECT'.tr, () {
+                        //     showLinkSelectDialog(context, controller.targetId, isInside: true).then((itemInfo) {
+                        //       LOG('--> itemInfo : $itemInfo');
+                        //       if (itemInfo != null) {
+                        //         setState(() {
+                        //           controller.targetInfo = itemInfo;
+                        //           controller.targetId = itemInfo['id'] ?? 'id_none';
+                        //         });
+                        //         // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
+                        //       }
+                        //     });
+                        //   }, Theme.of(context).colorScheme.secondaryContainer),
                         mainMenu(Icons.cleaning_services_outlined, 'CLEAR'.tr, () {
                           controller.clearPinMark(context).then((result) {
                             setState(() {
