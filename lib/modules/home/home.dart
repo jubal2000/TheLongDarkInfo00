@@ -18,6 +18,7 @@ import '../../global_widgets/gesture_zoom_box.dart';
 import '../../global_widgets/main_list_item.dart';
 import '../../routes.dart';
 import '../app/app_controller.dart';
+import '../map/map_screen_controller.dart';
 import 'home_controller.dart';
 
 class Home extends GetView<HomeController> {
@@ -254,7 +255,7 @@ class Home extends GetView<HomeController> {
                                 children: List<Widget>.of(AppData.mapData.entries.map((item) =>
                                   mainListItem(item.value, () {
                                     LOG('--> itemInfo : ${item.value}');
-                                    Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', item.value));
+                                    onMapSelected(item.value);
                                   })
                                 )).toList(),
                               )

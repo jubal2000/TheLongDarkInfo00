@@ -40,6 +40,8 @@ TextStyle itemDescStyle = TextStyle(
 TextStyle pinTitleStyle = TextStyle(
     fontSize: pin_title_font_size, color: Colors.black, fontWeight: FontWeight.w600, height: 1.1,
     shadows: outlinedText(strokeWidth: 0.2, strokeColor: Colors.white));
+TextStyle pinEditTitleStyle = TextStyle(
+    fontSize: pin_edit_title_font_size, color: Colors.white, fontWeight: FontWeight.w600, height: 1.1);
 
 /// Outlines a text using shadows.
 List<Shadow> outlinedText({double strokeWidth = 1, Color strokeColor = Colors.black, int precision = 4}) {

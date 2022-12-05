@@ -41,6 +41,7 @@ class ApiService extends GetxService {
     var result1 = await getMapData();
     var result2 = await getMapLinkData();
     var result3 = await getMapInsideData();
+    var result4 = await getLinkData();
     return result1;
   }
 
@@ -53,7 +54,9 @@ class ApiService extends GetxService {
 
       if (querySnapshot.docs.isNotEmpty) {
         for (var doc in querySnapshot.docs) {
-          AppData.mapData[doc.data()['id']] = FROM_SERVER_DATA(doc.data());
+          var item = FROM_SERVER_DATA(doc.data());
+          item['type'] = 0;
+          AppData.mapData[item['id']] = FROM_SERVER_DATA(item);
           // LOG('--> resultData [${outName[i]}]: ${doc.data()}');
         }
         LOG('--> getMapData result : ${AppData.mapData}');
@@ -67,12 +70,6 @@ class ApiService extends GetxService {
     }
   }
 
-  Future<dynamic> getMapLinkDataAll() async {
-    var result1 = await getMapLinkData();
-    var result2 = await getMapInsideData();
-    return result2;
-  }
-
   Future<dynamic> getMapLinkData() async {
     if (JSON_NOT_EMPTY(AppData.mapLinkData)) return AppData.mapLinkData;
     try {
@@ -82,7 +79,9 @@ class ApiService extends GetxService {
 
       if (querySnapshot.docs.isNotEmpty) {
         for (var doc in querySnapshot.docs) {
-          AppData.mapLinkData[doc.data()['id']] = FROM_SERVER_DATA(doc.data());
+          var item = FROM_SERVER_DATA(doc.data());
+          item['type'] = 1;
+          AppData.mapLinkData[item['id']] = FROM_SERVER_DATA(item);
           // LOG('--> resultData [${outName[i]}]: ${doc.data()}');
         }
         LOG('--> getMapLinkData result : ${AppData.mapLinkData}');
@@ -105,7 +104,9 @@ class ApiService extends GetxService {
 
       if (querySnapshot.docs.isNotEmpty) {
         for (var doc in querySnapshot.docs) {
-          AppData.mapInsideData[doc.data()['id']] = FROM_SERVER_DATA(doc.data());
+          var item = FROM_SERVER_DATA(doc.data());
+          item['type'] = 2;
+          AppData.mapInsideData[item['id']] = FROM_SERVER_DATA(item);
           // LOG('--> resultData [${outName[i]}]: ${doc.data()}');
         }
         LOG('--> getMapInsideData result : ${AppData.mapInsideData}');
@@ -142,7 +143,7 @@ class ApiService extends GetxService {
     return null;
   }
 
-  // pin data..
+  // map link data..
   final LinkCollection = 'data_link';
 
   Future<dynamic> getLinkData() async {

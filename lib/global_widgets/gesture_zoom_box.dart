@@ -26,11 +26,11 @@ class GestureZoomBox extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _GestureZoomBoxState();
+    return GestureZoomBoxState();
   }
 }
 
-class _GestureZoomBoxState extends State<GestureZoomBox>
+class GestureZoomBoxState extends State<GestureZoomBox>
     with TickerProviderStateMixin {
   final double _maxDragOver = 100;
 
@@ -78,8 +78,9 @@ class _GestureZoomBoxState extends State<GestureZoomBox>
     super.dispose();
   }
 
-  getScale() {
-    return _scale;
+  resetScaleValue() {
+    _animationScale(1.0);
+    _animationOffset(Offset.zero);
   }
 
   _onPointerUp(PointerUpEvent event) {

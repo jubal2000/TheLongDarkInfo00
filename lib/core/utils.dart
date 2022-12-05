@@ -836,6 +836,7 @@ class ImageTile extends StatelessWidget {
 
 class RoundedButton extends StatelessWidget {
   final VoidCallback? onPressed;
+  final double height;
   final String label;
   final Color textColor, backgroundColor, borderColor;
   final bool fullWidth;
@@ -845,6 +846,7 @@ class RoundedButton extends StatelessWidget {
     Key? key,
     @required this.onPressed,
     required this.label,
+    this.height = 50,
     this.textColor = Colors.white,
     this.backgroundColor = Colors.blue,
     this.borderColor = Colors.blue,
@@ -861,6 +863,7 @@ class RoundedButton extends StatelessWidget {
       onPressed: onPressed,
       child: Container(
         width: fullWidth ? double.infinity : null,
+        height: height,
         padding: padding,
         decoration: BoxDecoration(
           color: backgroundColor,
@@ -870,13 +873,15 @@ class RoundedButton extends StatelessWidget {
             color: borderColor,
           ),
         ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            color: textColor,
-            fontSize: fontSize,
+        child: Center(
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: textColor,
+              fontSize: fontSize,
+            ),
           ),
         ),
       ),

@@ -788,30 +788,15 @@ Future showLinkSelectDialog(BuildContext context, String targetId, {bool isInsid
           insetPadding: EdgeInsets.symmetric(horizontal: 10),
           backgroundColor: dialogBgColor,
           content: SingleChildScrollView(
-            child: FutureBuilder(
-              future: isAll ? api.getMapLinkDataAll() : isInside ? api.getMapInsideData() : api.getMapLinkData(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    child: ListBody(
-                      children: isInside ? getInsideList(targetId, (itemInfo) {
-                        Navigator.of(context).pop(itemInfo);
-                      }) : getLinkList(targetId, (itemInfo) {
-                        Navigator.of(context).pop(itemInfo);
-                      }),
-                    )
-                  );
-                } else {
-                  return Center(
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator()
-                    )
-                  );
-                }
-              }
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: ListBody(
+                children: isInside ? getInsideList(targetId, (itemInfo) {
+                  Navigator.of(context).pop(itemInfo);
+                }) : getLinkList(targetId, (itemInfo) {
+                  Navigator.of(context).pop(itemInfo);
+                }),
+              )
             )
           ),
           actions: [

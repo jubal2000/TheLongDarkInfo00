@@ -16,7 +16,8 @@ class AppData {
   static JSON listSelectData = {};
 
   static bool isPinShow = true;
-  static bool isEditMode = true;
+  static bool isDevMode = true;
+  static bool isEditMode = false;
 }
 
 const GameIcons = [

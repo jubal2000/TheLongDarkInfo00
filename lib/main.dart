@@ -13,6 +13,7 @@ import 'package:the_long_dark_info/service/api_service.dart';
 import 'package:the_long_dark_info/service/firebase_service.dart';
 import 'package:flash/flash.dart';
 import 'package:the_long_dark_info/service/local_service.dart';
+import 'package:wakelock/wakelock.dart';
 
 import './routes.dart';
 import 'core/themes.dart';
@@ -29,7 +30,12 @@ void main() async {
   await Get.putAsync(() => LocalService().init());
 
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]); //세로모드로 고정
+
+  // 락 스크린 고정..
+  Wakelock.enable();
+
+  //세로모드로 고정
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(MyApp());
 }
