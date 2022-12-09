@@ -88,7 +88,7 @@ class MapScreenController extends GetxController {
 
   List<Widget> getPinListWidget(context, onUpdate) {
     List<Widget> result = [];
-    if (AppData.pinData[targetId] != null && LIST_NOT_EMPTY(AppData.pinData[targetId]['data'])) {
+    if (isPinNotEmpty()) {
       for (var item in AppData.pinData[targetId]['data']) {
         var itemId = STR(item['id']);
         var dx = DBL(item['dx']);
@@ -296,6 +296,10 @@ class MapScreenController extends GetxController {
     return result;
   }
 
+  isPinNotEmpty() {
+    return AppData.pinData[targetId] != null && LIST_NOT_EMPTY(AppData.pinData[targetId]['data']);
+  }
+
   // showLinkListMark(item, Function()? onSelected, [bool isAddMode = false, bool isEditMode = false]) {
   //   return Positioned(
   //     top: DBL(item['sy']),
@@ -344,62 +348,60 @@ class MapScreenController extends GetxController {
     );
   }
 
-  // showLinkListMark(item, [bool isEditMode = false, Function(JSON)? onChanged]) {
-  //   return StatefulBuilder(
-  //     builder: (context, setState) {
-  //       return Stack(
-  //         children: [
-  //           Positioned(
-  //             top: DBL(item['sy']),
-  //             left: DBL(item['sx']),
-  //             child: Container(
-  //               width: DBL(item['ex']) - DBL(item['sx']),
-  //               height: DBL(item['ey']) - DBL(item['sy']),
-  //               color: isEditMode ? Colors.green.withOpacity(0.75) : Colors.black45,
-  //             ),
-  //           ),
-  //           Positioned(
-  //             top: DBL(item['sy']) - 5,
-  //             left: DBL(item['sx']) - 5,
-  //             child: Stack(
-  //               children: [
-  //                 GestureDetector(
-  //                   onPanUpdate: (detail) {
-  //                     setState(() {
-  //                       item['sx'] = detail.localPosition.dx;
-  //                       item['sy'] = detail.localPosition.dy;
-  //                       item['ex'] = item['ex'] - item['sx'];
-  //                       item['ey'] = item['ey'] - item['sy'];
-  //                     });
-  //                   },
-  //                   child: Container(
-  //                     width: DBL(item['ex']) - DBL(item['sx']) + 10,
-  //                     height: DBL(item['ey']) - DBL(item['sy']) + 10,
-  //                     color: Colors.transparent,
-  //                   ),
-  //                 ),
-  //                 Positioned(
-  //                     left: 0,
-  //                     top: 0,
-  //                     child: GestureDetector(
-  //                       child: Icon(Icons.circle, size: 10, color: Colors.redAccent),
-  //                     )
-  //                 ),
-  //                 Positioned(
-  //                     right: 0,
-  //                     bottom: 0,
-  //                     child: GestureDetector(
-  //                       child: Icon(Icons.circle, size: 10, color: Colors.blueAccent),
-  //                     )
-  //                 )
-  //               ]
-  //             )
-  //           ),
-  //         ]
-  //       );
-  //     }
-  //   );
-  // }
+  showLinkListMarkEx(item, [bool isAddMode = false, bool isEditMode = false, Function(JSON)? onChanged]) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Stack(
+          children: [
+            Positioned(
+              top: DBL(item['sy']),
+              left: DBL(item['sx']),
+              child: Container(
+                width: DBL(item['ex']) - DBL(item['sx']),
+                height: DBL(item['ey']) - DBL(item['sy']),
+                color: isEditMode ? Colors.green.withOpacity(0.75) : Colors.black45,
+              ),
+            ),
+            Positioned(
+              top: DBL(item['sy']) - 5,
+              left: DBL(item['sx']) - 5,
+              child: Stack(
+                children: [
+                  GestureDetector(
+                    onPanUpdate: (detail) {
+                      setState(() {
+                        item['sx'] = detail.localPosition.dx;
+                        item['sy'] = detail.localPosition.dy;
+                      });
+                    },
+                    child: Container(
+                      width: DBL(item['ex']) - DBL(item['sx']) + 10,
+                      height: DBL(item['ey']) - DBL(item['sy']) + 10,
+                      color: isAddMode ? Colors.green.withOpacity(0.75) : isEditMode ? Colors.black45 : Colors.black12,
+                    ),
+                  ),
+                  Positioned(
+                      left: 0,
+                      top: 0,
+                      child: GestureDetector(
+                        child: Icon(Icons.circle, size: 10, color: Colors.redAccent),
+                      )
+                  ),
+                  Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: GestureDetector(
+                        child: Icon(Icons.circle, size: 10, color: Colors.blueAccent),
+                      )
+                  )
+                ]
+              )
+            ),
+          ]
+        );
+      }
+    );
+  }
 
   getLinkEditInfo(detail) {
     var x = detail.localPosition.dx;

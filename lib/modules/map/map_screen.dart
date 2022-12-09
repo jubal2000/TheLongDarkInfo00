@@ -89,7 +89,16 @@ class MapScreen extends GetView<MapScreenController> {
                           ),
                         ],
                       ),
-                      body: Stack(
+                      body: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            image: DecorationImage(
+                              image: AssetImage("assets/back/background_01.jpg"),
+                              fit: BoxFit.fill,
+                              opacity: 0.5,
+                            ),
+                          ),
+                        child: Stack(
                           children: [
                             GestureZoomBox(
                               key: controller.zoomKey,
@@ -217,8 +226,9 @@ class MapScreen extends GetView<MapScreenController> {
                             )
                           ],
                         ]
+                      )
                     ),
-                    floatingActionButton: FabCircularMenu(
+                    floatingActionButton: controller.isPinNotEmpty() ? FabCircularMenu(
                       fabOpenIcon: Icon(Icons.menu, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
                       fabCloseIcon: Icon(Icons.close, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
                       fabMargin: EdgeInsets.all(15),
@@ -240,23 +250,9 @@ class MapScreen extends GetView<MapScreenController> {
                             }
                           });
                         }, Theme.of(context).colorScheme.secondaryContainer),
-                        // if (AppData.mapData[controller.targetId] != null && LIST_NOT_EMPTY(AppData.mapData[controller.targetId]['insideData']))
-                        //   mainMenu(Icons.star_border, 'OBJECT'.tr, () {
-                        //     showLinkSelectDialog(context, controller.targetId, isInside: true).then((itemInfo) {
-                        //       LOG('--> itemInfo : $itemInfo');
-                        //       if (itemInfo != null) {
-                        //         setState(() {
-                        //           controller.targetInfo = itemInfo;
-                        //           controller.targetId = itemInfo['id'] ?? 'id_none';
-                        //         });
-                        //         // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
-                        //       }
-                        //     });
-                        //   }, Theme.of(context).colorScheme.secondaryContainer),
                         mainMenu(Icons.cleaning_services_outlined, 'CLEAR'.tr, () {
                           controller.clearPinMark(context).then((result) {
-                            setState(() {
-                            });
+                            setState(() {});
                           });
                         }, Theme.of(context).colorScheme.secondaryContainer),
                         mainMenu(AppData.isPinShow ? Icons.visibility_outlined : Icons.visibility_off_outlined, AppData.isPinShow ? 'SHOW'.tr : 'HIDE'.tr, () {
@@ -266,6 +262,20 @@ class MapScreen extends GetView<MapScreenController> {
                           });
                         }, Theme.of(context).colorScheme.secondaryContainer),
                       ]
+                    ) : FloatingActionButton(
+                        onPressed: () {
+                          showLinkSelectDialog(context, controller.targetId).then((itemInfo) {
+                            LOG('--> itemInfo : $itemInfo');
+                            if (itemInfo != null) {
+                              setState(() {
+                                controller.targetInfo = itemInfo;
+                                controller.targetId = itemInfo['id'] ?? 'id_none';
+                              });
+                              // Get.toNamed(Routes.MAP_SCREEN, parameters: PARAMETER_JSON('data', itemInfo));
+                            }
+                          });
+                        },
+                        child: Icon(Icons.share),
                     ),
                   )
                 )

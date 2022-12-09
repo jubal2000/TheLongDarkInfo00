@@ -17,7 +17,7 @@ Widget mainListItem(JSON itemInfo, [Function()? onSelect]) {
       },
       child: Container(
         height: item_height,
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: EdgeInsets.fromLTRB(15, 3, 8, 3),
         margin: EdgeInsets.symmetric(vertical: 2),
         decoration: BoxDecoration(
           color: INT(itemInfo['type']) == 1 ? Colors.white60 : Colors.white,
@@ -26,9 +26,13 @@ Widget mainListItem(JSON itemInfo, [Function()? onSelect]) {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            if (STR(itemInfo['icon']).isNotEmpty)...[
-              showImage('assets/icons/game/${STR(itemInfo['icon'])}.png', Size(40, 40), NAVY.shade300),
-              SizedBox(width: 10),
+            // if (STR(itemInfo['icon']).isNotEmpty)...[
+            //   showImage('assets/icons/game/${STR(itemInfo['icon'])}.png', Size(40, 40), NAVY.shade300),
+            //   SizedBox(width: 10),
+            // ],
+            if (INT(itemInfo['type']) == 0)...[
+              showImage('assets/ui/main/${itemInfo['id']}.png', Size(40,40)),
+              SizedBox(width: 15),
             ],
             Expanded(
                 child: Row(

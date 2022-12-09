@@ -90,14 +90,15 @@ class Home extends GetView<HomeController> {
                 ],
               ),
               body: Container(
-                color: NAVY.shade100,
-                // decoration: BoxDecoration(
-                //   image: DecorationImage(
-                //     image: AssetImage("assets/back/background_01.png"),
-                //     repeat: ImageRepeat.repeat,
-                //     scale: 2,
-                //   ),
-                // ),
+                // color: NAVY.shade200,
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey,
+                  image: DecorationImage(
+                    image: AssetImage("assets/back/background_01.jpg"),
+                    fit: BoxFit.fill,
+                    opacity: 0.5,
+                  ),
+                ),
                 child: FutureBuilder(
                   future: controller.getMapData(),
                   builder: (context, snapshot) {
@@ -128,24 +129,14 @@ class Home extends GetView<HomeController> {
                                     child: IceTile(index: 0, title: '고요한강 협곡', mapInfo: AppData.mapData['hushed_river_valley'], onSelect: onMapSelected),
                                   ),
                                   StaggeredGridTile.count(
-                                    crossAxisCellCount: 1,
-                                    mainAxisCellCount: 1,
+                                    crossAxisCellCount: 3,
+                                    mainAxisCellCount: 2,
                                     child: IceTile(index: 1, color: Colors.transparent),
-                                  ),
-                                  StaggeredGridTile.count(
-                                    crossAxisCellCount: 1,
-                                    mainAxisCellCount: 1,
-                                    child: IceTile(index: 2, color: Colors.transparent),
                                   ),
                                   StaggeredGridTile.count(
                                     crossAxisCellCount: 2,
                                     mainAxisCellCount: 2,
                                     child: IceTile(index: 3, title: '블랙록', mapInfo: AppData.mapData['blackrock'], onSelect: onMapSelected),
-                                  ),
-                                  StaggeredGridTile.count(
-                                    crossAxisCellCount: 1,
-                                    mainAxisCellCount: 1,
-                                    child: IceTile(index: 4, color: Colors.transparent),
                                   ),
                                   StaggeredGridTile.count(
                                     crossAxisCellCount: 2,
@@ -154,28 +145,18 @@ class Home extends GetView<HomeController> {
                                   ),
                                   StaggeredGridTile.count(
                                     crossAxisCellCount: 2,
-                                    mainAxisCellCount: 1,
-                                    child: IceTile(index: 6, title: '간수의 길목', mapInfo: AppData.mapData['keepers_pass'], onSelect: onMapSelected),
-                                  ),
-                                  StaggeredGridTile.count(
-                                    crossAxisCellCount: 1,
-                                    mainAxisCellCount: 1,
-                                    child: IceTile(index: 7, color: Colors.transparent),
-                                  ),
-                                  StaggeredGridTile.count(
-                                    crossAxisCellCount: 2,
                                     mainAxisCellCount: 2,
                                     child: IceTile(index: 8, title: '마운틴 타운', mapInfo: AppData.mapData['mountain_town'], onSelect: onMapSelected),
                                   ),
                                   StaggeredGridTile.count(
-                                    crossAxisCellCount: 2,
+                                    crossAxisCellCount: 4,
                                     mainAxisCellCount: 2,
-                                    child: IceTile(index: 9, title: '신비로운 호수', mapInfo: AppData.mapData['mystery_lake'], onSelect: onMapSelected),
+                                    child: IceTile(index: 1, color: Colors.transparent),
                                   ),
                                   StaggeredGridTile.count(
-                                    crossAxisCellCount: 3,
+                                    crossAxisCellCount: 1,
                                     mainAxisCellCount: 2,
-                                    child: IceTile(index: 10, title: '행복한 계곡', mapInfo: AppData.mapData['pleasant_valley'], onSelect: onMapSelected),
+                                    child: IceTile(index: 6, title: '간수의 길목', mapInfo: AppData.mapData['keepers_pass'], onSelect: onMapSelected),
                                   ),
                                   StaggeredGridTile.count(
                                     crossAxisCellCount: 2,
@@ -188,29 +169,24 @@ class Home extends GetView<HomeController> {
                                     child: IceTile(index: 12, title: '쓸쓸한 들판', mapInfo: AppData.mapData['forlorn_muskeg'], onSelect: onMapSelected),
                                   ),
                                   StaggeredGridTile.count(
-                                    crossAxisCellCount: 1,
-                                    mainAxisCellCount: 1,
-                                    child: IceTile(index: 13, color: Colors.transparent),
-                                  ),
-                                  StaggeredGridTile.count(
-                                    crossAxisCellCount: 1,
-                                    mainAxisCellCount: 1,
-                                    child: IceTile(index: 14, color: Colors.transparent),
-                                  ),
-                                  StaggeredGridTile.count(
-                                    crossAxisCellCount: 1,
+                                    crossAxisCellCount: 2,
                                     mainAxisCellCount: 2,
+                                    child: IceTile(index: 9, title: '신비로운 호수', mapInfo: AppData.mapData['mystery_lake'], onSelect: onMapSelected),
+                                  ),
+                                  StaggeredGridTile.count(
+                                    crossAxisCellCount: 2,
+                                    mainAxisCellCount: 1,
                                     child: IceTile(index: 15, title: '굽이치는 강', mapInfo: AppData.mapData['winding_river'], onSelect: onMapSelected),
                                   ),
                                   StaggeredGridTile.count(
                                     crossAxisCellCount: 2,
                                     mainAxisCellCount: 2,
-                                    child: IceTile(index: 16, color: Colors.transparent),
+                                    child: IceTile(index: 10, title: '행복한 계곡', mapInfo: AppData.mapData['pleasant_valley'], onSelect: onMapSelected),
                                   ),
                                   StaggeredGridTile.count(
-                                    crossAxisCellCount: 2,
+                                    crossAxisCellCount: 1,
                                     mainAxisCellCount: 2,
-                                    child: IceTile(index: 17, color: Colors.transparent),
+                                    child: IceTile(index: 1, color: Colors.transparent),
                                   ),
                                   StaggeredGridTile.count(
                                     crossAxisCellCount: 2,

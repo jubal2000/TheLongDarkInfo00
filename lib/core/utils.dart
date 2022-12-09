@@ -294,7 +294,7 @@ Widget showImage(String url, Size size, [Color? color]) {
 }
 
 Widget showImageFit(dynamic imagePath) {
-  return showImageWidget(imagePath, BoxFit.cover);
+  return showImageWidget(imagePath, BoxFit.fill);
 }
 
 Widget showImageWidget(dynamic imagePath, BoxFit fit, {Color? color}) {
@@ -736,63 +736,49 @@ class IceTile extends StatelessWidget {
   final JSON? mapInfo;
   final Function(JSON)? onSelect;
 
-  final TextStyle titleStyle   = TextStyle(fontSize: 12, color: NAVY, fontWeight: FontWeight.w700);
-  final TextStyle titleExStyle = TextStyle(fontSize: 8, color: Colors.black38, fontWeight: FontWeight.w600);
+  final TextStyle titleStyle   = TextStyle(fontSize: 12, color: NAVY, fontWeight: FontWeight.w700, shadows: outlinedText(strokeWidth: 0.4, strokeColor: Colors.white));
+  final TextStyle titleExStyle = TextStyle(fontSize: 8, color: Colors.blueGrey, fontWeight: FontWeight.w700, shadows: outlinedText(strokeWidth: 0.4, strokeColor: Colors.white));
 
   @override
   Widget build(BuildContext context) {
     final child = GestureDetector(
-        onTap: () {
-          if (onSelect != null) onSelect!(mapInfo ?? {});
-        },
-        child: Container(
-            height: extent,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2),
-              color: color,
-            ),
-            child: Stack(
-                children: [
-                  if (color != Colors.transparent)
-                  BottomCenterAlign(
-                    child: Container(
-                      height: 6,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(2),
-                          bottomRight: Radius.circular(2),
-                        ),
-                        color: borderColor.withOpacity(0.6),
-                      ),
-                    ),
-                  ),
-                  Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (mapInfo == null && title != null)...[
-                            Text(title!, style: titleStyle, textAlign: TextAlign.center),
-                          ],
-                          if (mapInfo != null)...[
-                            Text(STR(mapInfo!['title_kr']), style: titleStyle, textAlign: TextAlign.center),
-                            SizedBox(height: 3),
-                            Text(STR(mapInfo!['title']), style: titleExStyle, textAlign: TextAlign.center),
-                          ],
-                          SizedBox(height: 5),
-                          // Text('$index', style: titleStyle),
-                        ],
-                      )
-                    // child: CircleAvatar(
-                    //   minRadius: 20,
-                    //   maxRadius: 20,
-                    //   backgroundColor: Colors.white,
-                    //   foregroundColor: Colors.black,
-                    //   child: Text('$index', style: const TextStyle(fontSize: 20)),
-                    // ),
-                  ),
-                ]
-            )
+      onTap: () {
+        if (onSelect != null) onSelect!(mapInfo ?? {});
+      },
+      child: Container(
+        height: extent,
+        color: color,
+        child: Stack(
+          children: [
+            if (color != Colors.transparent && mapInfo != null)...[
+              showImageFit('assets/ui/main/${mapInfo!['id']}.png'),
+              BottomCenterAlign(
+                child: Container(
+                  height: 6,
+                  color: borderColor.withOpacity(0.6),
+                ),
+              ),
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (mapInfo == null && title != null)...[
+                      Text(title!, style: titleStyle, textAlign: TextAlign.center),
+                    ],
+                    if (mapInfo != null)...[
+                      Text(STR(mapInfo!['title_kr']), style: titleStyle, textAlign: TextAlign.center),
+                      SizedBox(height: 3),
+                      Text(STR(mapInfo!['title']), style: titleExStyle, textAlign: TextAlign.center),
+                    ],
+                    SizedBox(height: 5),
+                    // Text('$index', style: titleStyle),
+                  ],
+                )
+              ),
+            ],
+          ]
         )
+      )
     );
 
     if (bottomSpace == null) {
