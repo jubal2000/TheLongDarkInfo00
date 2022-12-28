@@ -8,6 +8,8 @@ class Words extends Translations {
         },
         'ko': {
           'app_title': 'The Long Dark Map',
+          'Interloper': '침입자',
+          'Memento': '매멘토',
           'START': '시작하기',
         }
       };

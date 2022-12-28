@@ -40,6 +40,9 @@ class MapScreenController extends GetxController {
   var linkEditStep = 0;
   JSON linkEditInfo = {};
 
+  var  mementoIndex = 0;
+  final mementoMax = 2;
+
   @override
   void onInit() {
     targetId = '';
@@ -69,7 +72,7 @@ class MapScreenController extends GetxController {
   onImageTap(context, detail) async {
     final dx = detail.localPosition.dx;
     final dy = detail.localPosition.dy;
-    LOG('--> onTapUp : $dx, $dy');
+    LOG('--> onImageTap : $dx, $dy');
     if (AppData.pinData[targetId] == null) {
       AppData.pinData[targetId] = {
         'id': targetId,
@@ -84,6 +87,80 @@ class MapScreenController extends GetxController {
     };
     var result = await showPinEditDialog(context, targetId, pinData);
     LOG('--> result : $result');
+  }
+
+  clearMementoInfo() {
+    mementoIndex = 0;
+    AppData.mementoData[targetId] = List.generate(2, (index) => {
+      'start': {
+        'x': -1,
+        'y': -1,
+        'desc': '',
+        'image': '',
+      },
+      'end': {
+        'x': -1,
+        'y': -1,
+        'desc': '',
+        'image': '',
+      },
+      'reward': '',
+      'interloper': '',
+    });
+  }
+
+  onMementoPositionSet(context, detail, onChanged) {
+    LOG('--> onMementoPositionSet [$targetId] : $mementoIndex');
+    if (!AppData.mementoData.containsKey(targetId)) {
+      clearMementoInfo();
+    }
+    var item = AppData.mementoData[targetId][mementoIndex];
+    if (DBL(item['start']['x']) <= 0 && DBL(item['start']['y']) <= 0) {
+      item['start']['x'] = detail.localPosition.dx;
+      item['start']['y'] = detail.localPosition.dy;
+    } else {
+      item['end']['x'] = detail.localPosition.dx;
+      item['end']['y'] = detail.localPosition.dy;
+      if (mementoIndex + 1 < mementoMax) {
+        mementoIndex++;
+      }
+    }
+    LOG('--> $item');
+  }
+
+  showMementoDialog(context, index) {
+    var item = AppData.mementoData[targetId];
+    if (item != null) {
+      showMementoEditDialog(context, targetId, item, index).then((result) {
+      });
+    }
+  }
+
+  showMementoMark() {
+    return List.generate(2, (index) {
+      var item = AppData.mementoData[targetId][index];
+      var sx = DBL(item['start']['x']);
+      var sy = DBL(item['start']['y']);
+      var dx = DBL(item['end']['x']);
+      var dy = DBL(item['end']['y']);
+      return Stack(
+        children: [
+          if (sx > 0 && sy > 0)...[
+            Positioned(
+              top: sy - 6,
+              left: sx - 6,
+              child: Icon(Icons.add_circle_outline, size: 12, color: Colors.green),
+            ),
+            if (dx > 0 && dy > 0)
+              Positioned(
+                top: dy - 6,
+                left: dx - 6,
+                child: Icon(Icons.add_circle_outline, size: 12, color: Colors.red),
+              )
+          ]
+        ]
+      );
+    });
   }
 
   List<Widget> getPinListWidget(context, onUpdate) {
@@ -163,42 +240,6 @@ class MapScreenController extends GetxController {
                 );
               }
             )
-            // child: LongPressDraggable(
-            //   onDragEnd: (detail) {
-            //     var offset = detail.offset;
-            //     LOG('--> dx org : $dx / $dy - $offset');
-            //     item['dx'] = MediaQuery.of(context).size.width + offset.dx;
-            //     item['dy'] = MediaQuery.of(context).size.height + offset.dy;
-            //     LOG('--> dx pos : ${item['dx']} / ${item['dy']}');
-            //     if (onUpdate != null) onUpdate(detail);
-            //   },
-            //   dragAnchorStrategy: (Draggable<Object> _, BuildContext __, Offset ___) =>
-            //     Offset(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
-            //   feedback: SizedBox(
-            //     width: MediaQuery.of(context).size.width * 2,
-            //     height: MediaQuery.of(context).size.height * 2,
-            //     child: Stack(
-            //       children: [
-            //         Center(
-            //           child: Container(
-            //             width: 2,
-            //             height: MediaQuery.of(context).size.height * 2,
-            //             color: Colors.red,
-            //           ),
-            //         ),
-            //         Center(
-            //           child: Container(
-            //             width: MediaQuery.of(context).size.width * 2,
-            //             height: 2,
-            //             color: Colors.red,
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            //   childWhenDragging: showPinMark(item, true),
-            //   child: showPinMark(item),
-            // )
           )
         );
       }
@@ -229,13 +270,6 @@ class MapScreenController extends GetxController {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(STR(item['title']), style: pinTitleStyle, textAlign: TextAlign.center),
-                    // Container(
-                    //   padding: EdgeInsets.all(1),
-                    //   decoration: BoxDecoration(
-                    //     color: Colors.white54,
-                    //     borderRadius: BorderRadius.all(Radius.circular(1.5)),
-                    //   ),
-                    //   child: Text(STR(item['title']), style: pinTitleStyle),
                     Stack(
                       children: [
                         Icon(Icons.circle, size: pinSize+1, color: Colors.black),
@@ -289,7 +323,7 @@ class MapScreenController extends GetxController {
     for (var item in AppData.linkData.entries) {
       // LOG('--> getLinkListWidget item : $targetId / ${item.value['targetId']}');
       if (item.value['targetId'] == targetId) {
-        result.add(showLinkListMark(item.value, onSelected, false, AppData.isEditMode));
+        result.add(showLinkListMark(item.value, onSelected, false, AppData.isLinkEditMode));
       }
     }
     // LOG('--> getLinkListWidget result : ${result.length}');
@@ -300,22 +334,22 @@ class MapScreenController extends GetxController {
     return AppData.pinData[targetId] != null && LIST_NOT_EMPTY(AppData.pinData[targetId]['data']);
   }
 
-  // showLinkListMark(item, Function()? onSelected, [bool isAddMode = false, bool isEditMode = false]) {
+  // showLinkListMark(item, Function()? onSelected, [bool isAddMode = false, bool isLinkEditMode = false]) {
   //   return Positioned(
   //     top: DBL(item['sy']),
   //     left: DBL(item['sx']),
   //     child: Container(
   //       width: DBL(item['ex']) - DBL(item['sx']),
   //       height: DBL(item['ey']) - DBL(item['sy']),
-  //       color: isAddMode ? Colors.green.withOpacity(0.75) : isEditMode ? Colors.black45 : Colors.black12,
+  //       color: isAddMode ? Colors.green.withOpacity(0.75) : isLinkEditMode ? Colors.black45 : Colors.black12,
   //       child: Center(
-  //         child: isEditMode ? Text(STR(item['linkTitle_kr']), style: pinEditTitleStyle) : Container(),
+  //         child: isLinkEditMode ? Text(STR(item['linkTitle_kr']), style: pinEditTitleStyle) : Container(),
   //       )
   //     ),
   //   );
   // }
 
-  showLinkListMark(item, Function()? onSelected, [bool isAddMode = false, bool isEditMode = false]) {
+  showLinkListMark(item, Function()? onSelected, [bool isAddMode = false, bool isLinkEditMode = false]) {
     return Positioned(
       top: DBL(item['sy']),
       left: DBL(item['sx']),
@@ -333,12 +367,12 @@ class MapScreenController extends GetxController {
           child: Container(
             width: DBL(item['ex']) - DBL(item['sx']),
             height: DBL(item['ey']) - DBL(item['sy']),
-            color: isAddMode ? Colors.green.withOpacity(0.75) : isEditMode ? Colors.black45 : Colors.black12,
+            color: isAddMode ? Colors.green.withOpacity(0.75) : isLinkEditMode ? Colors.black45 : Colors.black12,
             child: Center(
               child: Column(
                 children: [
-                  isAddMode || isEditMode ? Text(STR(item['linkTitle_kr']), style: pinEditTitleStyle) : Container(),
-                  isEditMode ? Text(STR(item['id']).toString().substring(0, 3), style: pinEditTitleStyle) : Container(),
+                  isAddMode || isLinkEditMode ? Text(STR(item['linkTitle_kr']), style: pinEditTitleStyle) : Container(),
+                  isLinkEditMode ? Text(STR(item['id']).toString().substring(0, 3), style: pinEditTitleStyle) : Container(),
                 ]
               )
             )
@@ -348,7 +382,7 @@ class MapScreenController extends GetxController {
     );
   }
 
-  showLinkListMarkEx(item, [bool isAddMode = false, bool isEditMode = false, Function(JSON)? onChanged]) {
+  showLinkListMarkEx(item, [bool isAddMode = false, bool isLinkEditMode = false, Function(JSON)? onChanged]) {
     return StatefulBuilder(
       builder: (context, setState) {
         return Stack(
@@ -359,7 +393,7 @@ class MapScreenController extends GetxController {
               child: Container(
                 width: DBL(item['ex']) - DBL(item['sx']),
                 height: DBL(item['ey']) - DBL(item['sy']),
-                color: isEditMode ? Colors.green.withOpacity(0.75) : Colors.black45,
+                color: isLinkEditMode ? Colors.green.withOpacity(0.75) : Colors.black45,
               ),
             ),
             Positioned(
@@ -377,7 +411,7 @@ class MapScreenController extends GetxController {
                     child: Container(
                       width: DBL(item['ex']) - DBL(item['sx']) + 10,
                       height: DBL(item['ey']) - DBL(item['sy']) + 10,
-                      color: isAddMode ? Colors.green.withOpacity(0.75) : isEditMode ? Colors.black45 : Colors.black12,
+                      color: isAddMode ? Colors.green.withOpacity(0.75) : isLinkEditMode ? Colors.black45 : Colors.black12,
                     ),
                   ),
                   Positioned(

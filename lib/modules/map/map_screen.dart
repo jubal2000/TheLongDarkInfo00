@@ -64,29 +64,57 @@ class MapScreen extends GetView<MapScreenController> {
                         child: Icon(Icons.arrow_back, size: 24),
                       ),
                       actions: [
-                        GestureDetector(
+                        InkWell(
                           onTap: () {
                             Get.back();
                           },
                           child: Icon(Icons.home, size: 24),
                         ),
-                        if (AppData.isDevMode)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Switch(
-                                  value: AppData.isEditMode,
-                                  onChanged: (status) {
-                                    setState(() {
-                                      AppData.isEditMode = status;
-                                      controller.clearLinkEditInfo();
-                                    });
-                                  }
-                              ),
-                              Text(AppData.isEditMode ? 'Edit ON' : 'Edit OFF', style: itemDescStyle),
-                              SizedBox(width: 15),
-                            ]
+                        SizedBox(width: 10),
+                        if (AppData.isDevMode)...[
+                          // Row(
+                          //     mainAxisAlignment: MainAxisAlignment.start,
+                          //     children: [
+                          //       Switch(
+                          //           value: AppData.isLinkEditMode,
+                          //           onChanged: (status) {
+                          //             setState(() {
+                          //               AppData.isLinkEditMode = status;
+                          //               AppData.isMemEditMode = false;
+                          //               controller.clearLinkEditInfo();
+                          //             });
+                          //           }
+                          //       ),
+                          //       Text(AppData.isLinkEditMode ? 'Link ON' : 'Link OFF', style: itemDescStyle),
+                          //       SizedBox(width: 15),
+                          //     ]
+                          // ),
+                          // SizedBox(width: 10),
+                          InkWell(
+                            onTap: () {
+                              controller.showMementoDialog(context, 0);
+                            },
+                            child: Icon(Icons.radar, size: 24),
                           ),
+                          SizedBox(width: 10),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Switch(
+                                    value: AppData.isMemEditMode,
+                                    onChanged: (status) {
+                                      setState(() {
+                                        AppData.isMemEditMode = status;
+                                        AppData.isLinkEditMode = false;
+                                        controller.clearMementoInfo();
+                                      });
+                                    }
+                                ),
+                                Text(AppData.isLinkEditMode ? 'Mem ON' : 'Mem OFF', style: itemDescStyle),
+                                SizedBox(width: 15),
+                              ]
+                          ),
+                          ]
                         ],
                       ),
                       body: Container(
@@ -120,7 +148,7 @@ class MapScreen extends GetView<MapScreenController> {
                                     GestureDetector(
                                       onTapUp: (detail) {
                                         LOG('--> onTapUp : $detail');
-                                        if (AppData.isEditMode) {
+                                        if (AppData.isLinkEditMode) {
                                           if (controller.linkEditStep == 0) {
                                             controller.linkEditInfo['sx'] = detail.localPosition.dx;
                                             controller.linkEditInfo['sy'] = detail.localPosition.dy;
@@ -136,12 +164,18 @@ class MapScreen extends GetView<MapScreenController> {
                                             });
                                           }
                                         }
+                                        if (AppData.isMemEditMode) {
+                                          setState(() {
+                                            controller.onMementoPositionSet(context, detail, () {
+                                              setState(() {});
+                                            });
+                                          });
+                                        }
                                     },
                                     onLongPressStart: (detail) {
-                                      LOG('--> detail : ${detail.localPosition}');
+                                      LOG('--> onLongPressStart : $detail');
                                       controller.onImageTap(context, detail).then((result) {
-                                        setState(() {
-                                        });
+                                        setState(() {});
                                       });
                                     },
                                     child: showImageFit(STR(controller.targetInfo['map_full'])),
@@ -158,6 +192,8 @@ class MapScreen extends GetView<MapScreenController> {
                                       }
                                     });
                                   }),
+                                  if (AppData.mementoData[controller.targetId] != null)
+                                    ...controller.showMementoMark(),
                                   if (controller.linkEditStep == 2)
                                     controller.showLinkListMark(controller.linkEditInfo, null, true),
                                 ],
@@ -185,7 +221,7 @@ class MapScreen extends GetView<MapScreenController> {
                           // ),
                         // ]
                           ),
-                          if (AppData.isEditMode && controller.linkEditStep == 2)...[
+                          if (AppData.isLinkEditMode && controller.linkEditStep == 2)...[
                             BottomCenterAlign(
                               child: Container(
                                 padding: EdgeInsets.fromLTRB(20, 0, 100, 20),

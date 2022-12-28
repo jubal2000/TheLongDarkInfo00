@@ -14,7 +14,7 @@ import 'common_colors.dart';
 
 typedef JSON = Map<dynamic, dynamic>;
 typedef SnapShot = QuerySnapshot<Map<String, dynamic>>;
-const String NO_IMAGE = 'assets/app_icon_01.png';
+const String NO_IMAGE = 'assets/icons/app_icon_01.png';
 
 // ignore: non_constant_identifier_names
 LOG(String msg) {
@@ -875,3 +875,50 @@ class RoundedButton extends StatelessWidget {
   }
 }
 
+TextCheckBox(BuildContext context, String title, bool value,
+    {
+      var subTitle = '',
+      var padding = EdgeInsets.zero,
+      var height = 30.0,
+      Function(bool)? onChanged
+    }) {
+  return Container(
+      padding: padding,
+      child: Column(
+          children: [
+            Container(
+                height: height,
+                padding: padding,
+                child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                            title,
+                            style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor.withOpacity(0.5), fontWeight: FontWeight.w800)),
+                      ),
+                      Switch(
+                        value: value,
+                        onChanged: onChanged,
+                      )
+                    ]
+                )
+            ),
+            if (subTitle.isNotEmpty)...[
+              SizedBox(height: 5),
+              Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    // border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                ),
+                child: Text(
+                    subTitle,
+                    style: TextStyle(fontSize: 10, color: Theme.of(context).hintColor, fontWeight: FontWeight.w600)
+                ),
+              ),
+            ]
+          ]
+      )
+  );
+}

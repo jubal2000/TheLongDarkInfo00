@@ -13,12 +13,14 @@ class AppData {
   static JSON mapLinkData = {};
   static JSON mapInsideData = {};
   static JSON pinData = {};
+  static JSON mementoData = {};
   static JSON linkData = {};
   static JSON listSelectData = {};
 
   static bool isPinShow = true;
   static bool isDevMode = true;
-  static bool isEditMode = false;
+  static bool isLinkEditMode = false;
+  static bool isMemEditMode = false;
 }
 
 const GameIcons = [

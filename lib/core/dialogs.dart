@@ -12,6 +12,7 @@ import 'package:the_long_dark_info/service/local_service.dart';
 import 'package:uuid/uuid.dart';
 
 import '../global_widgets/card_scroll_viewer.dart';
+import '../global_widgets/image_picker.dart';
 import '../global_widgets/main_list_item.dart';
 import 'app_data.dart';
 import 'common_colors.dart';
@@ -408,9 +409,6 @@ Future<JSON> showPinUploadDialog(BuildContext context, JSON pinData) async {
 }
 
 Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinData) async {
-  // final api       = Get.find<ApiService>();
-  // final firebase  = Get.find<FirebaseService>();
-  // final imageGalleryKey   = GlobalKey();
   final local             = Get.find<LocalService>();
   final titleController   = TextEditingController();
   final editController    = TextEditingController();
@@ -420,7 +418,6 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
 
   JSON iconList = {};
   JSON jsonData = {};
-  var isChanged = false;
   var isNew = true;
   var selectIcon = '';
   var isSelectIcon = false;
@@ -546,7 +543,6 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                       onChanged: (value) {
                         setState(() {
                           jsonData['title'] = value;
-                          isChanged = true;
                         });
                       },
                     ),
@@ -562,7 +558,6 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                       onChanged: (value) {
                         setState(() {
                           jsonData['desc'] = value;
-                          isChanged = true;
                         });
                       },
                     ),
@@ -616,6 +611,222 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
         ),
       );
     }
+  );
+}
+
+Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<JSON> data, int index, {bool isNew = true}) async {
+  final startController   = TextEditingController();
+  final endController     = TextEditingController();
+  final rewardController  = TextEditingController();
+
+  var showIndex = index;
+
+  initData() {
+    startController.text  = STR(data[index]['start']['desc']);
+    endController.text    = STR(data[index]['end'  ]['desc']);
+    rewardController.text = STR(data[index]['reward']);
+  }
+
+  initData();
+
+  return await showDialog(
+      context: context,
+      builder: (BuildContext dlgContext) {
+        return PointerInterceptor(
+          child: StatefulBuilder(
+              builder: (context, setState) {
+                return AlertDialog(
+                  scrollable: true,
+                  title: Text(isNew ? 'Memento add'.tr : 'Memento info'.tr, style: dialogTitleTextStyle),
+                  insetPadding: EdgeInsets.all(15),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                  backgroundColor: dialogBgColor,
+                  content: StatefulBuilder(
+                    builder: (context, setState) {
+                      return Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                        constraints: BoxConstraints(
+                          minWidth: MediaQuery.of(context).size.width,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 40,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          showIndex = 0;
+                                          initData();
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
+                                          border: Border.all(width: 2.0, color: showIndex == 0 ? Theme.of(context).primaryColor : Colors.black45),
+                                          color: showIndex == 0 ? Theme.of(context).primaryColor.withOpacity(0.3) : Colors.black12,
+                                        ),
+                                        child: Center(
+                                          child: Text('1', style: showIndex == 0 ? itemTitleStyle : itemDescStyle),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          showIndex = 1;
+                                          initData();
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
+                                          border: Border.all(width: 2.0, color: showIndex == 1 ? Theme.of(context).primaryColor : Colors.black45),
+                                          color: showIndex == 1 ? Theme.of(context).primaryColor.withOpacity(0.3) : Colors.black12,
+                                        ),
+                                        child: Center(
+                                          child: Text('2', style: showIndex == 1 ? itemTitleStyle : itemDescStyle),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ),
+                            SizedBox(height: 10),
+                            Text('Start info'.tr, style: dialogDescTextStyle),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child:TextFormField(
+                                    controller: startController,
+                                    decoration: inputLabel(context, 'Description'.tr, ''),
+                                    keyboardType: TextInputType.text,
+                                    maxLines: 1,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        data[index]['start']['desc'] = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                InkWell(
+                                  onTap: () {
+                                    ShowImagePicker(context, 'start').then((result) {
+                                      if (result != null) {
+                                        setState(() {
+                                          LOG('--> start result : $result');
+                                          data[index]['start']['image'] = result;
+                                        });
+                                      }
+                                    });
+                                  },
+                                  child: showImage(data[index]['start']['image'], Size(40,40)),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Text('End info'.tr, style: dialogDescTextStyle),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child:TextFormField(
+                                    controller: endController,
+                                    decoration: inputLabel(context, 'Description'.tr, ''),
+                                    keyboardType: TextInputType.text,
+                                    maxLines: 1,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        data[index]['end']['desc'] = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                InkWell(
+                                  onTap: () {
+                                    ShowImagePicker(context, 'end').then((result) {
+                                      if (result != null) {
+                                        setState(() {
+                                          LOG('--> end result : $result');
+                                          data[index]['end']['image'] = result;
+                                        });
+                                      }
+                                    });
+                                  },
+                                  child: showImage(data[index]['end']['image'], Size(40,40)),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Text('Reward'.tr, style: dialogDescTextStyle),
+                            TextFormField(
+                              controller: rewardController,
+                              decoration: inputLabel(context, 'Description'.tr, ''),
+                              keyboardType: TextInputType.multiline,
+                              maxLines: null,
+                              minLines: 4,
+                              maxLength: 200,
+                              onChanged: (value) {
+                                setState(() {
+                                  data[index]['reward'] = value;
+                                });
+                              },
+                            ),
+                            SizedBox(height: 10),
+                            TextCheckBox(context, 'Including interloper', BOL(data[index]['interloper']), onChanged: (value) {
+                              data[index]['interloper'] = value ? '1' : '';
+                            })
+                          ],
+                        )
+                      );
+                    }
+                  ),
+                  actions: [
+                    TextButton(
+                      child: Text('Cancel'.tr),
+                      onPressed: () {
+                        Navigator.pop(dlgContext, {});
+                      },
+                    ),
+                    TextButton(
+                        child: Text('OK'.tr),
+                        onPressed: () {
+                          showLoadingDialog(context, 'Uploading now...'.tr);
+                          Future.delayed(Duration(milliseconds: 200), () async {
+                            LOG('--> add memento [$targetId] : ${data[index]}');
+                            if (isNew) {
+                              AppData.mementoData[targetId]['data'].add(data[index]);
+                            } else {
+                              for (var i=0; i<AppData.mementoData[targetId]['data'].length; i++) {
+                                var item = AppData.mementoData[targetId]['data'][i];
+                                if (STR(item['id']) == STR(data[index]['id'])) {
+                                  AppData.mementoData[targetId]['data'][i] = data[index];
+                                  break;
+                                }
+                              }
+                            }
+                            Navigator.of(dialogContext!).pop();
+                            Future.delayed(Duration(milliseconds: 200), () async {
+                              Navigator.pop(dlgContext, data[index]);
+                            });
+                          });
+                        }
+                    )
+                  ],
+                );
+              }
+          ),
+        );
+      }
   );
 }
 
