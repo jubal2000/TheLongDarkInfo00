@@ -10,11 +10,14 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:the_long_dark_info/core/style.dart';
 import 'package:tphoto_view/photo_view.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:math' as math;
+
 
 import '../../core/app_data.dart';
 import '../../core/common_colors.dart';
 import '../../core/dialogs.dart';
 import '../../core/utils.dart';
+import '../../global_widgets/arrow_painter.dart';
 import '../../global_widgets/gesture_zoom_box.dart';
 import '../../service/api_service.dart';
 import '../../service/local_service.dart';
@@ -39,6 +42,7 @@ class MapScreenController extends GetxController {
   var mapScale = 1.0;
   var linkEditStep = 0;
   JSON linkEditInfo = {};
+  List<JSON> mementoData = [];
 
   var  mementoIndex = 0;
   final mementoMax = 2;
@@ -91,7 +95,7 @@ class MapScreenController extends GetxController {
 
   clearMementoInfo() {
     mementoIndex = 0;
-    AppData.mementoData[targetId] = List.generate(2, (index) => {
+    mementoData = List.generate(2, (index) => {
       'start': {
         'x': -1,
         'y': -1,
@@ -111,56 +115,153 @@ class MapScreenController extends GetxController {
 
   onMementoPositionSet(context, detail, onChanged) {
     LOG('--> onMementoPositionSet [$targetId] : $mementoIndex');
+    if (mementoIndex >= mementoMax) mementoIndex = 0;
     if (!AppData.mementoData.containsKey(targetId)) {
       clearMementoInfo();
     }
-    var item = AppData.mementoData[targetId][mementoIndex];
+    var item = mementoData[mementoIndex];
     if (DBL(item['start']['x']) <= 0 && DBL(item['start']['y']) <= 0) {
       item['start']['x'] = detail.localPosition.dx;
       item['start']['y'] = detail.localPosition.dy;
     } else {
       item['end']['x'] = detail.localPosition.dx;
       item['end']['y'] = detail.localPosition.dy;
-      if (mementoIndex + 1 < mementoMax) {
-        mementoIndex++;
-      }
+      mementoIndex++;
     }
     LOG('--> $item');
   }
 
   showMementoDialog(context, index) {
-    var item = AppData.mementoData[targetId];
-    if (item != null) {
-      showMementoEditDialog(context, targetId, item, index).then((result) {
-      });
-    }
+    showMementoEditDialog(context, targetId, mementoData, index);
   }
 
-  showMementoMark() {
+  showMementoEditMark(context) {
     return List.generate(2, (index) {
-      var item = AppData.mementoData[targetId][index];
+      var item = mementoData[index];
+      var sx = DBL(item['start']['x']);
+      var sy = DBL(item['start']['y']);
+      var dx = DBL(item['end']['x']);
+      var dy = DBL(item['end']['y']);
+      return Stack(
+          children: [
+            if (sx > 0 && sy > 0)...[
+              Positioned(
+                top: sy - 6,
+                left: sx - 6,
+                child: Icon(Icons.add_circle_outline, size: 12, color: Colors.purple),
+              ),
+              if (dx > 0 && dy > 0)...[
+                Positioned(
+                  top: dy - 6,
+                  left: dx - 6,
+                  child: Icon(Icons.add_circle_outline, size: 12, color: Colors.purple),
+                ),
+                IgnorePointer(
+                    child: CustomPaint(
+                      size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
+                      painter: ArrowPainter([ArrowPainterItem(sx, sy, dx, dy, Colors.red)]),
+                    )
+                )
+              ]
+            ]
+          ]
+      );
+    });
+  }
+
+  showMementoMark(context) {
+    return List.generate(2, (index) {
+      var item = AppData.mementoData[targetId]['data'][index];
+      LOG('--> showMementoMark [$index] : $item');
       var sx = DBL(item['start']['x']);
       var sy = DBL(item['start']['y']);
       var dx = DBL(item['end']['x']);
       var dy = DBL(item['end']['y']);
       return Stack(
         children: [
+          if (sx > 0 && sy > 0 && dx > 0 && dy > 0)...[
+            IgnorePointer(
+                child: CustomPaint(
+                  size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
+                  painter: ArrowPainter([ArrowPainterItem(sx, sy, dx, dy, Colors.red)]),
+                )
+            ),
+          ],
           if (sx > 0 && sy > 0)...[
             Positioned(
-              top: sy - 6,
+              top: sy - 11,
               left: sx - 6,
-              child: Icon(Icons.add_circle_outline, size: 12, color: Colors.green),
+              child: InkWell(
+                onTap: () {
+                  showMementoInfo(context, index, item['start']);
+                },
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: -1,
+                      top: -1,
+                      child: Icon(Icons.place, size: 14, color: Colors.black),
+                    ),
+                    Icon(Icons.place, size: 12, color: index == 0 ? Colors.blue : Colors.green),
+                  ],
+                ),
+              ),
             ),
-            if (dx > 0 && dy > 0)
+            if (dx > 0 && dy > 0)...[
               Positioned(
-                top: dy - 6,
+                top: dy - 11,
                 left: dx - 6,
-                child: Icon(Icons.add_circle_outline, size: 12, color: Colors.red),
-              )
+                child: InkWell(
+                  onTap: () {
+                    showMementoInfo(context, index, item['end']);
+                  },
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: -1,
+                        top: -1,
+                        child: Icon(Icons.place, size: 14, color: Colors.black),
+                      ),
+                      Icon(Icons.place, size: 12, color: index == 0 ? Colors.blue : Colors.green),
+                    ],
+                  ),
+                ),
+              ),
+            ]
           ]
         ]
       );
     });
+  }
+
+  showMementoInfo(context, index, data) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200,
+          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text('Memento information'.tr, style: itemTitleStyle),
+                Row(
+                  children: [
+
+                    Text(DESC(data['desc'])),
+                  ]
+                ),
+                // ElevatedButton(
+                //   child: const Text('Close BottomSheet'),
+                //   onPressed: () => Navigator.pop(context),
+                // ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   List<Widget> getPinListWidget(context, onUpdate) {
@@ -356,6 +457,7 @@ class MapScreenController extends GetxController {
       child: PointerInterceptor(
         child: GestureDetector(
           onTap: () {
+            if (AppData.isLinkEditMode || AppData.isMemEditMode) return;
             var linkId = item['linkId'];
             LOG('--> link touched : $linkId');
             var targetInfo = AppData.mapData[linkId] ?? AppData.mapLinkData[linkId] ?? AppData.mapInsideData[linkId];

@@ -618,8 +618,7 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
   final startController   = TextEditingController();
   final endController     = TextEditingController();
   final rewardController  = TextEditingController();
-
-  var showIndex = index;
+  final api = Get.find<ApiService>();
 
   initData() {
     startController.text  = STR(data[index]['start']['desc']);
@@ -661,18 +660,18 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
                                     child: InkWell(
                                       onTap: () {
                                         setState(() {
-                                          showIndex = 0;
+                                          index = 0;
                                           initData();
                                         });
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
-                                          border: Border.all(width: 2.0, color: showIndex == 0 ? Theme.of(context).primaryColor : Colors.black45),
-                                          color: showIndex == 0 ? Theme.of(context).primaryColor.withOpacity(0.3) : Colors.black12,
+                                          border: Border.all(width: 2.0, color: index == 0 ? Theme.of(context).primaryColor : Colors.black45),
+                                          color: index == 0 ? Theme.of(context).primaryColor.withOpacity(0.3) : Colors.black12,
                                         ),
                                         child: Center(
-                                          child: Text('1', style: showIndex == 0 ? itemTitleStyle : itemDescStyle),
+                                          child: Text('1', style: index == 0 ? itemTitleStyle : itemDescStyle),
                                         ),
                                       ),
                                     ),
@@ -681,18 +680,18 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
                                     child: InkWell(
                                       onTap: () {
                                         setState(() {
-                                          showIndex = 1;
+                                          index = 1;
                                           initData();
                                         });
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
-                                          border: Border.all(width: 2.0, color: showIndex == 1 ? Theme.of(context).primaryColor : Colors.black45),
-                                          color: showIndex == 1 ? Theme.of(context).primaryColor.withOpacity(0.3) : Colors.black12,
+                                          border: Border.all(width: 2.0, color: index == 1 ? Theme.of(context).primaryColor : Colors.black45),
+                                          color: index == 1 ? Theme.of(context).primaryColor.withOpacity(0.3) : Colors.black12,
                                         ),
                                         child: Center(
-                                          child: Text('2', style: showIndex == 1 ? itemTitleStyle : itemDescStyle),
+                                          child: Text('2', style: index == 1 ? itemTitleStyle : itemDescStyle),
                                         ),
                                       ),
                                     ),
@@ -720,7 +719,7 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
                                 SizedBox(width: 10),
                                 InkWell(
                                   onTap: () {
-                                    ShowImagePicker(context, 'start').then((result) {
+                                    ShowImagePicker(context, Uuid().v1().toString()).then((result) {
                                       if (result != null) {
                                         setState(() {
                                           LOG('--> start result : $result');
@@ -753,7 +752,7 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
                                 SizedBox(width: 10),
                                 InkWell(
                                   onTap: () {
-                                    ShowImagePicker(context, 'end').then((result) {
+                                    ShowImagePicker(context, Uuid().v1().toString()).then((result) {
                                       if (result != null) {
                                         setState(() {
                                           LOG('--> end result : $result');
@@ -783,7 +782,9 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
                             ),
                             SizedBox(height: 10),
                             TextCheckBox(context, 'Including interloper', BOL(data[index]['interloper']), onChanged: (value) {
-                              data[index]['interloper'] = value ? '1' : '';
+                              setState(() {
+                                data[index]['interloper'] = value ? '1' : '';
+                              });
                             })
                           ],
                         )
@@ -803,20 +804,20 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
                           showLoadingDialog(context, 'Uploading now...'.tr);
                           Future.delayed(Duration(milliseconds: 200), () async {
                             LOG('--> add memento [$targetId] : ${data[index]}');
-                            if (isNew) {
-                              AppData.mementoData[targetId]['data'].add(data[index]);
-                            } else {
-                              for (var i=0; i<AppData.mementoData[targetId]['data'].length; i++) {
-                                var item = AppData.mementoData[targetId]['data'][i];
-                                if (STR(item['id']) == STR(data[index]['id'])) {
-                                  AppData.mementoData[targetId]['data'][i] = data[index];
-                                  break;
-                                }
+                            var addData = {
+                              'id': targetId,
+                              'status': 1,
+                              'data': data,
+                              'createTime': CURRENT_SERVER_TIME()
+                            };
+                            api.addMementoData(addData).then((result) {
+                              if (result != null) {
+                                AppData.mementoData[targetId] = result;
                               }
-                            }
-                            Navigator.of(dialogContext!).pop();
-                            Future.delayed(Duration(milliseconds: 200), () async {
-                              Navigator.pop(dlgContext, data[index]);
+                              Navigator.of(dialogContext!).pop();
+                              Future.delayed(Duration(milliseconds: 200), () async {
+                                Navigator.pop(dlgContext, data[index]);
+                              });
                             });
                           });
                         }

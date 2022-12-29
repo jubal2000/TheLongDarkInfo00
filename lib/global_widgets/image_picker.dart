@@ -15,14 +15,15 @@ ShowImagePicker(BuildContext context, String key) async {
   if (pickImage != null) {
     var imageUrl  = await showImageCroper(pickImage.path);
     LOG('---> imageUrl : $imageUrl');
-    if (imageUrl != null) {
-      showLoadingDialog(context, 'uploading now...'.tr);
-      var imageData = await ReadFileByte(imageUrl);
-      JSON imageInfo = {'id': key, 'image': imageData};
-      var upResult = await api.uploadImageData(imageInfo, 'user_img');
-      Navigator.of(dialogContext!).pop();
-      return upResult;
-    }
+    return imageUrl;
+    // if (imageUrl != null) {
+      // showLoadingDialog(context, 'uploading now...'.tr);
+      // var imageData = await ReadFileByte(imageUrl);
+      // JSON imageInfo = {'id': key, 'image': imageData};
+      // var upResult = await api.uploadImageData(imageInfo, 'memento_img');
+      // Navigator.of(dialogContext!).pop();
+      // return upResult;
+    // }
     // showLoadingDialog(context, 'Now Uploading...');
     // Future.delayed(Duration(milliseconds: 200), () {
     //   var imageByte = pickList.first;

@@ -39,11 +39,12 @@ class ApiService extends GetxService {
   }
 
   Future<dynamic> getMapDataAll() async {
-    var result1 = await getMapData();
-    var result2 = await getMapLinkData();
-    var result3 = await getMapInsideData();
-    var result4 = await getLinkData();
-    return result1;
+    await getMapData();
+    await getMapLinkData();
+    await getMapInsideData();
+    await getLinkData();
+    var result = await getMementoData();
+    return result;
   }
 
   Future<dynamic> getMapData() async {
@@ -188,6 +189,53 @@ class ApiService extends GetxService {
       return result;
     } catch (e) {
       LOG('--> addLinkData : $e');
+    }
+    return null;
+  }
+
+  // map memento data..
+  final MementoCollection = 'data_memento';
+
+  Future<dynamic> getMementoData() async {
+    if (JSON_NOT_EMPTY(AppData.mementoData)) return AppData.mementoData;
+    try {
+      var collectionRef = firebase.firestore!.collection(MementoCollection);
+      var querySnapshot = await collectionRef
+          .where('status', isEqualTo: 1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (var doc in querySnapshot.docs) {
+          AppData.mementoData[doc.data()['id']] = FROM_SERVER_DATA(doc.data());
+          // LOG('--> resultData [${outName[i]}]: ${doc.data()}');
+        }
+        LOG('--> getMementoData result : ${AppData.mementoData}');
+        return AppData.mementoData;
+      } else {
+        LOG('--> getMementoData : no data');
+        return {'error' : 'no data'};
+      }
+    } catch (e) {
+      LOG('--> getMementoData Error : $e');
+      return {'error' : e.toString()};
+    }
+  }
+
+  Future<JSON?> addMementoData(JSON addItem) async {
+    try {
+      var dataRef = firebase.firestore!.collection(MementoCollection);
+      var key = STR(addItem['id']).toString();
+      if (key.isEmpty) {
+        key = dataRef.doc().id;
+        addItem['id'] = key;
+        addItem['status'] = 1;
+        addItem['createTime'] = CURRENT_SERVER_TIME();
+      }
+      await dataRef.doc(key).set(Map<String, dynamic>.from(addItem));
+      var result = FROM_SERVER_DATA(addItem);
+      return result;
+    } catch (e) {
+      LOG('--> addMementoData : $e');
     }
     return null;
   }

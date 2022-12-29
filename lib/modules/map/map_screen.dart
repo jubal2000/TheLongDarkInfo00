@@ -30,6 +30,7 @@ class MapScreen extends GetView<MapScreenController> {
       future: api.getMapDataAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            LOG('--> controller.targetId : ${controller.targetId} / ${AppData.mementoData[controller.targetId]}');
             return StatefulBuilder(
               builder: (context, setState) {
                 return WillPopScope(
@@ -110,7 +111,7 @@ class MapScreen extends GetView<MapScreenController> {
                                       });
                                     }
                                 ),
-                                Text(AppData.isLinkEditMode ? 'Mem ON' : 'Mem OFF', style: itemDescStyle),
+                                Text(AppData.isMemEditMode ? 'Mem ON' : 'Mem OFF', style: itemDescStyle),
                                 SizedBox(width: 15),
                               ]
                           ),
@@ -192,10 +193,14 @@ class MapScreen extends GetView<MapScreenController> {
                                       }
                                     });
                                   }),
-                                  if (AppData.mementoData[controller.targetId] != null)
-                                    ...controller.showMementoMark(),
-                                  if (controller.linkEditStep == 2)
-                                    controller.showLinkListMark(controller.linkEditInfo, null, true),
+                                  if (!AppData.isMemEditMode && AppData.mementoData[controller.targetId] != null)
+                                    ...controller.showMementoMark(context),
+                                  if (AppData.isDevMode)...[
+                                    if (AppData.isMemEditMode)
+                                      ...controller.showMementoEditMark(context),
+                                    if (controller.linkEditStep == 2)
+                                      controller.showLinkListMark(controller.linkEditInfo, null, true),
+                                  ]
                                 ],
                               ),
                             ),

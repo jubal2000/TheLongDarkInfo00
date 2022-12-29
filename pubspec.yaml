@@ -64,6 +64,7 @@ dependencies:
 #  gesture_zoom_box: ^0.0.4
   flutter_colorpicker: ^1.0.3
   wakelock: ^0.6.2
+  arrow_path: ^3.0.0
 
   # firebase..
   firebase_core: ^1.23.0
