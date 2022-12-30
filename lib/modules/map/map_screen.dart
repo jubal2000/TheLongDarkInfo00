@@ -91,12 +91,16 @@ class MapScreen extends GetView<MapScreenController> {
                           //     ]
                           // ),
                           // SizedBox(width: 10),
-                          InkWell(
-                            onTap: () {
-                              controller.showMementoDialog(context, 0);
-                            },
-                            child: Icon(Icons.radar, size: 24),
-                          ),
+                          if (AppData.isMemEditMode)...[
+                            InkWell(
+                              onTap: () {
+                                controller.showMementoDialog(context, 0, () {
+                                  setState(() {});
+                                });
+                              },
+                              child: Icon(Icons.radar, size: 24),
+                            ),
+                          ],
                           SizedBox(width: 10),
                           Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -107,7 +111,6 @@ class MapScreen extends GetView<MapScreenController> {
                                       setState(() {
                                         AppData.isMemEditMode = status;
                                         AppData.isLinkEditMode = false;
-                                        controller.clearMementoInfo();
                                       });
                                     }
                                 ),
@@ -193,11 +196,11 @@ class MapScreen extends GetView<MapScreenController> {
                                       }
                                     });
                                   }),
-                                  if (!AppData.isMemEditMode && AppData.mementoData[controller.targetId] != null)
-                                    ...controller.showMementoMark(context),
+                                  if (AppData.isMementoShow && AppData.mementoData[controller.targetId] != null)
+                                    ...controller.showMementoMark(context, () {
+                                      setState(() {});
+                                    }),
                                   if (AppData.isDevMode)...[
-                                    if (AppData.isMemEditMode)
-                                      ...controller.showMementoEditMark(context),
                                     if (controller.linkEditStep == 2)
                                       controller.showLinkListMark(controller.linkEditInfo, null, true),
                                   ]
@@ -236,13 +239,13 @@ class MapScreen extends GetView<MapScreenController> {
                                       child: RoundedButton(
                                         backgroundColor: Colors.indigo,
                                         onPressed: () {
-                                          controller.addLinkEditInfo(context, () {
+                                          controller.uploadLinkData(context, () {
                                             setState((){
                                               controller.clearLinkEditInfo();
                                             });
                                           });
                                         },
-                                        label: 'Upload mark',
+                                        label: 'Upload'.tr,
                                       ),
                                     ),
                                     SizedBox(
@@ -258,7 +261,7 @@ class MapScreen extends GetView<MapScreenController> {
                                             controller.clearLinkEditInfo();
                                           });
                                         },
-                                        label: 'Clear',
+                                        label: 'Clear'.tr,
                                       )
                                     )
                                   ]
@@ -266,6 +269,42 @@ class MapScreen extends GetView<MapScreenController> {
                               )
                             )
                           ],
+                            if (AppData.isMemEditMode)...[
+                              BottomCenterAlign(
+                                  child: Container(
+                                      padding: EdgeInsets.fromLTRB(20, 0, 100, 20),
+                                      child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: RoundedButton(
+                                                backgroundColor: Colors.indigo,
+                                                onPressed: () {
+                                                  controller.uploadMementoData(context);
+                                                },
+                                                label: 'Upload'.tr,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            SizedBox(
+                                                width: 65,
+                                                child: RoundedButton(
+                                                  backgroundColor: Colors.teal,
+                                                  padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                                                  onPressed: () {
+                                                    setState((){
+                                                      controller.clearMementoInfo();
+                                                    });
+                                                  },
+                                                  label: 'Clear'.tr,
+                                                )
+                                            )
+                                          ]
+                                      )
+                                  )
+                              )
+                            ],
                         ]
                       )
                     ),

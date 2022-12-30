@@ -42,10 +42,11 @@ class MapScreenController extends GetxController {
   var mapScale = 1.0;
   var linkEditStep = 0;
   JSON linkEditInfo = {};
-  List<JSON> mementoData = [];
 
   var  mementoIndex = 0;
   final mementoMax = 2;
+
+  var memTypeN = ['start', 'end'];
 
   @override
   void onInit() {
@@ -95,18 +96,28 @@ class MapScreenController extends GetxController {
 
   clearMementoInfo() {
     mementoIndex = 0;
-    mementoData = List.generate(2, (index) => {
+    if (AppData.mementoData[targetId] == null) {
+      var addData = {
+        'id': targetId,
+        'status': 1,
+        'data': [],
+        'createTime': CURRENT_SERVER_TIME()
+      };
+      AppData.mementoData[targetId] = FROM_SERVER_DATA(addData);
+    }
+    // clear data..
+    AppData.mementoData[targetId]['data'] = List.generate(2, (index) => {
       'start': {
         'x': -1,
         'y': -1,
         'desc': '',
-        'image': '',
+        'image': [],
       },
       'end': {
         'x': -1,
         'y': -1,
         'desc': '',
-        'image': '',
+        'image': [],
       },
       'reward': '',
       'interloper': '',
@@ -119,7 +130,7 @@ class MapScreenController extends GetxController {
     if (!AppData.mementoData.containsKey(targetId)) {
       clearMementoInfo();
     }
-    var item = mementoData[mementoIndex];
+    var item = AppData.mementoData[targetId]['data'][mementoIndex];
     if (DBL(item['start']['x']) <= 0 && DBL(item['start']['y']) <= 0) {
       item['start']['x'] = detail.localPosition.dx;
       item['start']['y'] = detail.localPosition.dy;
@@ -131,45 +142,52 @@ class MapScreenController extends GetxController {
     LOG('--> $item');
   }
 
-  showMementoDialog(context, index) {
-    showMementoEditDialog(context, targetId, mementoData, index);
-  }
-
-  showMementoEditMark(context) {
-    return List.generate(2, (index) {
-      var item = mementoData[index];
-      var sx = DBL(item['start']['x']);
-      var sy = DBL(item['start']['y']);
-      var dx = DBL(item['end']['x']);
-      var dy = DBL(item['end']['y']);
-      return Stack(
-          children: [
-            if (sx > 0 && sy > 0)...[
-              Positioned(
-                top: sy - 6,
-                left: sx - 6,
-                child: Icon(Icons.add_circle_outline, size: 12, color: Colors.purple),
-              ),
-              if (dx > 0 && dy > 0)...[
-                Positioned(
-                  top: dy - 6,
-                  left: dx - 6,
-                  child: Icon(Icons.add_circle_outline, size: 12, color: Colors.purple),
-                ),
-                IgnorePointer(
-                    child: CustomPaint(
-                      size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
-                      painter: ArrowPainter([ArrowPainterItem(sx, sy, dx, dy, Colors.red)]),
-                    )
-                )
-              ]
-            ]
-          ]
-      );
+  showMementoDialog(context, index, onUpdate) {
+    var editData = List<JSON>.from(AppData.mementoData[targetId]['data']);
+    showMementoEditDialog(context, targetId, editData, index).then((result) {
+      if (result != null) {
+        if (result.containsKey('delete')) {
+          showAlertYesNoDialog(context, 'Delete'.tr, 'Delete now?', '', 'Cancel'.tr, 'OK'.tr).then((dResult) {
+            if (dResult == 1) {
+              clearMementoInfo();
+              onUpdate();
+            }
+          });
+        } else {
+          AppData.mementoData[targetId]['data'] = result['result'];
+          onUpdate();
+        }
+      }
     });
   }
 
-  showMementoMark(context) {
+  uploadMementoData(context) {
+    LOG('--> uploadMementoData ready [$targetId] : ${AppData.mementoData[targetId]['data']}');
+    showLoadingDialog(context, 'Uploading now...'.tr);
+    Future.delayed(Duration(milliseconds: 200), () {
+      // AppData.mementoData[targetId]['data'].forEach((item) {
+      //   typeN.map((type) async {
+      //     LOG('--> $type : ${item[type]['imageLocal']}');
+      //   if (item[type]['imageLocal'] != null) {
+      //       var imageData = await ReadFileByte(item[type]['imageLocal']);
+      //       JSON imageInfo = {'id': Uuid().v1().toString(), 'image': imageData};
+      //       var path = await api.uploadImageData(imageInfo, 'memento_img');
+      //       item[type]['image'] = path;
+      //       item[type].delete('imageLocal');
+      //     }
+      //   });
+      // });
+      // LOG('--> uploadMementoData start [$targetId] : ${AppData.mementoData[targetId]}');
+      api.addMementoData(AppData.mementoData[targetId]).then((upResult) {
+        if (upResult != null) {
+          AppData.mementoData[targetId] = upResult;
+        }
+        Navigator.of(dialogContext!).pop();
+      });
+    });
+  }
+
+  showMementoMark(context, onUpdate) {
     return List.generate(2, (index) {
       var item = AppData.mementoData[targetId]['data'][index];
       LOG('--> showMementoMark [$index] : $item');
@@ -188,50 +206,56 @@ class MapScreenController extends GetxController {
             ),
           ],
           if (sx > 0 && sy > 0)...[
-            Positioned(
-              top: sy - 11,
-              left: sx - 6,
-              child: InkWell(
-                onTap: () {
-                  showMementoInfo(context, index, item['start']);
-                },
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: -1,
-                      top: -1,
-                      child: Icon(Icons.place, size: 14, color: Colors.black),
-                    ),
-                    Icon(Icons.place, size: 12, color: index == 0 ? Colors.blue : Colors.green),
-                  ],
-                ),
-              ),
-            ),
+            showMementoPin(context, index, true, onUpdate),
             if (dx > 0 && dy > 0)...[
-              Positioned(
-                top: dy - 11,
-                left: dx - 6,
-                child: InkWell(
-                  onTap: () {
-                    showMementoInfo(context, index, item['end']);
-                  },
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: -1,
-                        top: -1,
-                        child: Icon(Icons.place, size: 14, color: Colors.black),
-                      ),
-                      Icon(Icons.place, size: 12, color: index == 0 ? Colors.blue : Colors.green),
-                    ],
-                  ),
-                ),
-              ),
+              showMementoPin(context, index, false, onUpdate),
             ]
           ]
         ]
       );
     });
+  }
+
+  showMementoPin(context, index, isStart, onUpdate) {
+    var item = AppData.mementoData[targetId]['data'][index];
+    var type = isStart ? 'start' : 'end';
+    var sx = DBL(item[type]['x']);
+    var sy = DBL(item[type]['y']);
+    return Positioned(
+      top: sy - 11,
+      left: sx - 6,
+      child: GestureDetector(
+        onTap: () {
+          if (!AppData.isMemEditMode) {
+            showMementoInfo(context, index, item[type]);
+          }
+        },
+        onPanStart: (detail) {
+          if (AppData.isMemEditMode) {
+            isDragOn = '{$targetId}_$index';
+          }
+        },
+        onPanUpdate: (detail) {
+          if (isDragOn.isEmpty) return;
+          item[type]['x'] += detail.delta.dx;
+          item[type]['y'] += detail.delta.dy;
+          onUpdate();
+        },
+        onPanEnd: (detail) {
+          isDragOn = '';
+        },
+        child: Stack(
+          children: [
+            Positioned(
+              left: -1,
+              top: -0.85,
+              child: Icon(Icons.place, size: 14, color: Colors.black),
+            ),
+            Icon(Icons.place, size: 12, color: index == 0 ? Colors.blue : Colors.green),
+          ],
+        ),
+      ),
+    );
   }
 
   showMementoInfo(context, index, data) {
@@ -262,6 +286,10 @@ class MapScreenController extends GetxController {
         );
       },
     );
+  }
+
+  uploadPinData(context) {
+
   }
 
   List<Widget> getPinListWidget(context, onUpdate) {
@@ -556,7 +584,7 @@ class MapScreenController extends GetxController {
     return null;
   }
 
-  addLinkEditInfo(context, onUpdate) {
+  uploadLinkData(context, onUpdate) {
     api.addLinkData(linkEditInfo).then((addResult) {
       if (addResult != null) {
         AppData.linkData[addResult['id']] = addResult;

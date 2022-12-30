@@ -13,6 +13,7 @@ import 'package:uuid/uuid.dart';
 
 import '../global_widgets/card_scroll_viewer.dart';
 import '../global_widgets/image_picker.dart';
+import '../global_widgets/image_scroll_viewer.dart';
 import '../global_widgets/main_list_item.dart';
 import 'app_data.dart';
 import 'common_colors.dart';
@@ -614,7 +615,7 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
   );
 }
 
-Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<JSON> data, int index, {bool isNew = true}) async {
+Future<JSON?> showMementoEditDialog(BuildContext context, String targetId, List<JSON> data, int index, {bool isNew = true}) async {
   final startController   = TextEditingController();
   final endController     = TextEditingController();
   final rewardController  = TextEditingController();
@@ -719,16 +720,16 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
                                 SizedBox(width: 10),
                                 InkWell(
                                   onTap: () {
-                                    ShowImagePicker(context, Uuid().v1().toString()).then((result) {
-                                      if (result != null) {
-                                        setState(() {
-                                          LOG('--> start result : $result');
-                                          data[index]['start']['image'] = result;
-                                        });
-                                      }
-                                    });
+                                    // ShowImagePicker(context, Uuid().v1().toString()).then((result) {
+                                    //   if (result != null) {
+                                    //     setState(() {
+                                    //       LOG('--> start result : $result');
+                                    //       data[index]['start']['imageLocal'] = result;
+                                    //     });
+                                    //   }
+                                    // });
                                   },
-                                  child: showImage(data[index]['start']['image'], Size(40,40)),
+                                  child: showImage('assets/memento/${data[index]['start']['image'].first}.png', Size(40,40)),
                                 ),
                               ],
                             ),
@@ -752,16 +753,16 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
                                 SizedBox(width: 10),
                                 InkWell(
                                   onTap: () {
-                                    ShowImagePicker(context, Uuid().v1().toString()).then((result) {
-                                      if (result != null) {
-                                        setState(() {
-                                          LOG('--> end result : $result');
-                                          data[index]['end']['image'] = result;
-                                        });
-                                      }
-                                    });
+                                    // ShowImagePicker(context, Uuid().v1().toString()).then((result) {
+                                    //   if (result != null) {
+                                    //     setState(() {
+                                    //       LOG('--> end result : $result');
+                                    //       data[index]['end']['imageLocal'] = result;
+                                    //     });
+                                    //   }
+                                    // });
                                   },
-                                  child: showImage(data[index]['end']['image'], Size(40,40)),
+                                  child: showImage('assets/memento/${data[index]['end']['image'].first}.png', Size(40,40)),
                                 ),
                               ],
                             ),
@@ -793,33 +794,41 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
                   ),
                   actions: [
                     TextButton(
+                      child: Text('Delete'.tr, style: TextStyle(color: Colors.deepPurpleAccent)),
+                      onPressed: () {
+                        Navigator.pop(dlgContext, {'delete' : 'ok'});
+                      },
+                    ),
+                    showVerticalDivider(Size(40, 20)),
+                    TextButton(
                       child: Text('Cancel'.tr),
                       onPressed: () {
-                        Navigator.pop(dlgContext, {});
+                        Navigator.pop(dlgContext);
                       },
                     ),
                     TextButton(
                         child: Text('OK'.tr),
                         onPressed: () {
-                          showLoadingDialog(context, 'Uploading now...'.tr);
-                          Future.delayed(Duration(milliseconds: 200), () async {
-                            LOG('--> add memento [$targetId] : ${data[index]}');
-                            var addData = {
-                              'id': targetId,
-                              'status': 1,
-                              'data': data,
-                              'createTime': CURRENT_SERVER_TIME()
-                            };
-                            api.addMementoData(addData).then((result) {
-                              if (result != null) {
-                                AppData.mementoData[targetId] = result;
-                              }
-                              Navigator.of(dialogContext!).pop();
-                              Future.delayed(Duration(milliseconds: 200), () async {
-                                Navigator.pop(dlgContext, data[index]);
-                              });
-                            });
-                          });
+                          Navigator.pop(dlgContext, {'result' : data});
+                          // showLoadingDialog(context, 'Uploading now...'.tr);
+                          // Future.delayed(Duration(milliseconds: 200), () async {
+                          //   LOG('--> add memento [$targetId] : ${data[index]}');
+                          //   var addData = {
+                          //     'id': targetId,
+                          //     'status': 1,
+                          //     'data': data,
+                          //     'createTime': CURRENT_SERVER_TIME()
+                          //   };
+                          //   api.addMementoData(addData).then((result) {
+                          //     if (result != null) {
+                          //       AppData.mementoData[targetId] = result;
+                          //     }
+                          //     Navigator.of(dialogContext!).pop();
+                          //     Future.delayed(Duration(milliseconds: 200), () async {
+                          //       Navigator.pop(dlgContext, data[index]);
+                          //     });
+                          //   });
+                          // });
                         }
                     )
                   ],
@@ -829,6 +838,46 @@ Future<JSON> showMementoEditDialog(BuildContext context, String targetId, List<J
         );
       }
   );
+}
+
+Future showImageSlideDialog(BuildContext context, List<String> imageData, int startIndex) async {
+  // TextStyle _menuText   = TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.blueAccent);
+  LOG('--> showImageSlideDialog : $imageData / $startIndex');
+
+  return await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return PointerInterceptor(
+          child: AlertDialog(
+              title: SizedBox(height: 10),
+              scrollable: true,
+              insetPadding: EdgeInsets.all(15),
+              contentPadding: EdgeInsets.zero,
+              content: Container(
+                width: MediaQuery.of(context).size.width,
+                child: ImageScrollViewer(
+                  imageData,
+                  startIndex: startIndex,
+                  rowHeight: MediaQuery.of(context).size.width - 30,
+                  imageFit: BoxFit.contain,
+                  showArrow: true,
+                  showPage: true,
+                  autoScroll: false,
+                ),
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Close'.tr)
+                )
+              ]
+          ),
+        );
+      }
+  ) ?? '';
 }
 
 showLoadingDialog(BuildContext context, String message) {

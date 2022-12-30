@@ -225,12 +225,6 @@ class ApiService extends GetxService {
     try {
       var dataRef = firebase.firestore!.collection(MementoCollection);
       var key = STR(addItem['id']).toString();
-      if (key.isEmpty) {
-        key = dataRef.doc().id;
-        addItem['id'] = key;
-        addItem['status'] = 1;
-        addItem['createTime'] = CURRENT_SERVER_TIME();
-      }
       await dataRef.doc(key).set(Map<String, dynamic>.from(addItem));
       var result = FROM_SERVER_DATA(addItem);
       return result;
