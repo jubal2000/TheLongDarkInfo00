@@ -3,6 +3,7 @@ import 'package:the_long_dark_info/core/utils.dart';
 
 import '../../core/app_data.dart';
 import '../../service/api_service.dart';
+import '../app/app_information.dart';
 
 class HomeController extends GetxController {
   @override
@@ -15,5 +16,9 @@ class HomeController extends GetxController {
 
   Future<dynamic> getMapData() async {
     return await api.getMapData();
+  }
+
+  showAppInformation() {
+    Get.to(() => AppInformation());
   }
 }

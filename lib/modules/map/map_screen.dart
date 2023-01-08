@@ -71,26 +71,44 @@ class MapScreen extends GetView<MapScreenController> {
                           },
                           child: Icon(Icons.home, size: 24),
                         ),
+                        if (!AppData.isDevMode)...[
+                          SizedBox(width: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Switch(
+                                  value: AppData.isMementoShow,
+                                  onChanged: (status) {
+                                    setState(() {
+                                      AppData.isMementoShow = status;
+                                    });
+                                  }
+                              ),
+                              Text(AppData.isMemEditMode ? 'Mn Off'.tr : 'Mn ON'.tr, style: itemDescStyle),
+                              SizedBox(width: 15),
+                            ]
+                          ),
+                        ],
                         SizedBox(width: 10),
                         if (AppData.isDevMode)...[
-                          // Row(
-                          //     mainAxisAlignment: MainAxisAlignment.start,
-                          //     children: [
-                          //       Switch(
-                          //           value: AppData.isLinkEditMode,
-                          //           onChanged: (status) {
-                          //             setState(() {
-                          //               AppData.isLinkEditMode = status;
-                          //               AppData.isMemEditMode = false;
-                          //               controller.clearLinkEditInfo();
-                          //             });
-                          //           }
-                          //       ),
-                          //       Text(AppData.isLinkEditMode ? 'Link ON' : 'Link OFF', style: itemDescStyle),
-                          //       SizedBox(width: 15),
-                          //     ]
-                          // ),
-                          // SizedBox(width: 10),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Switch(
+                                    value: AppData.isLinkEditMode,
+                                    onChanged: (status) {
+                                      setState(() {
+                                        AppData.isLinkEditMode = status;
+                                        AppData.isMemEditMode = false;
+                                        controller.clearLinkEditInfo();
+                                      });
+                                    }
+                                ),
+                                Text(AppData.isLinkEditMode ? 'Link ON' : 'Link OFF', style: itemDescStyle),
+                                SizedBox(width: 15),
+                              ]
+                          ),
+                          SizedBox(width: 10),
                           if (AppData.isMemEditMode)...[
                             InkWell(
                               onTap: () {
@@ -196,7 +214,7 @@ class MapScreen extends GetView<MapScreenController> {
                                       }
                                     });
                                   }),
-                                  if (AppData.isMementoShow && AppData.mementoData[controller.targetId] != null)
+                                  if (AppData.mementoData[controller.targetId] != null)
                                     ...controller.showMementoMark(context, () {
                                       setState(() {});
                                     }),

@@ -720,6 +720,11 @@ Future<JSON?> showMementoEditDialog(BuildContext context, String targetId, List<
                                 SizedBox(width: 10),
                                 InkWell(
                                   onTap: () {
+                                    if (data[index]['start']['image'].isNotEmpty) {
+                                      var imageList = List<String>.from(data[index]['start']['image']).map((
+                                          item) => 'assets/memento/$item.png').toList();
+                                      showImageSlideDialog(context, imageList, 0);
+                                    }
                                     // ShowImagePicker(context, Uuid().v1().toString()).then((result) {
                                     //   if (result != null) {
                                     //     setState(() {
@@ -729,7 +734,7 @@ Future<JSON?> showMementoEditDialog(BuildContext context, String targetId, List<
                                     //   }
                                     // });
                                   },
-                                  child: showImage('assets/memento/${data[index]['start']['image'].first}.png', Size(40,40)),
+                                  child: data[index]['start']['image'].isNotEmpty ? showImage('assets/memento/${data[index]['start']['image'].first}.png', Size(40,40)) : showImage(NO_IMAGE, Size(40,40)),
                                 ),
                               ],
                             ),
@@ -753,16 +758,13 @@ Future<JSON?> showMementoEditDialog(BuildContext context, String targetId, List<
                                 SizedBox(width: 10),
                                 InkWell(
                                   onTap: () {
-                                    // ShowImagePicker(context, Uuid().v1().toString()).then((result) {
-                                    //   if (result != null) {
-                                    //     setState(() {
-                                    //       LOG('--> end result : $result');
-                                    //       data[index]['end']['imageLocal'] = result;
-                                    //     });
-                                    //   }
-                                    // });
+                                    if (data[index]['end']['image'].isNotEmpty) {
+                                      var imageList = List<String>.from(data[index]['end']['image']).map((
+                                          item) => 'assets/memento/$item.png').toList();
+                                      showImageSlideDialog(context, imageList, 0);
+                                    }
                                   },
-                                  child: showImage('assets/memento/${data[index]['end']['image'].first}.png', Size(40,40)),
+                                  child: data[index]['end']['image'].isNotEmpty ? showImage('assets/memento/${data[index]['end']['image'].first}.png', Size(40,40)) : showImage(NO_IMAGE, Size(40,40)),
                                 ),
                               ],
                             ),

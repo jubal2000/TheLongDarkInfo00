@@ -1,13 +1,16 @@
 import 'dart:async';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:helpers/helpers/widgets/align.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../core/app_data.dart';
+import '../core/dialogs.dart';
 import '../core/style.dart';
 import '../core/utils.dart';
+import 'card_scroll_viewer.dart';
 
 class ImageScrollViewer extends StatefulWidget {
   ImageScrollViewer(this.itemList, {Key? key,
@@ -263,3 +266,7 @@ class ImageScrollViewerState extends State<ImageScrollViewer> {
     super.dispose();
   }
 }
+
+
+
+

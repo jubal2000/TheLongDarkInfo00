@@ -78,7 +78,7 @@ class Intro extends GetView<IntroController> {
                         ),
                         Align(
                           alignment: Alignment(0, 0.95),
-                          child: Text('Version $APP_VERSION\nApp created by JH.Factory\nMapped by stmSantana', textAlign: TextAlign.center),
+                          child: Text('Version $APP_VERSION\nApp created by JH.Factory', textAlign: TextAlign.center),
                         )
                       ],
                     );

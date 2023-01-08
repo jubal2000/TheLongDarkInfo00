@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -42,7 +43,11 @@ class Home extends GetView<HomeController> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context, true);
+                    if (Platform.isAndroid) {
+                      SystemNavigator.pop();
+                    } else if (Platform.isIOS) {
+                      exit(0);
+                    }
                   },
                   child: const Text('확인'),
                 )
@@ -69,7 +74,7 @@ class Home extends GetView<HomeController> {
                 toolbarHeight: top_height,
                 automaticallyImplyLeading: false,
                 actions: [
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       setState(() {
                         controller.isMapMode = true;
@@ -78,13 +83,20 @@ class Home extends GetView<HomeController> {
                     child: Icon(Icons.map_outlined, size: 24, color: controller.isMapMode ? NAVY : Colors.black.withOpacity( 0.35)),
                   ),
                   SizedBox(width: 10),
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       setState(() {
                         controller.isMapMode = false;
                       });
                     },
                     child: Icon(Icons.view_list_sharp, size: 24, color: !controller.isMapMode ? NAVY : Colors.black.withOpacity( 0.35)),
+                  ),
+                  SizedBox(width: 10),
+                  InkWell(
+                    onTap: () {
+                      controller.showAppInformation();
+                    },
+                    child: Icon(Icons.info_outline, size: 24),
                   ),
                   SizedBox(width: 20),
                 ],

@@ -19,7 +19,8 @@ class ArrowPainterItem {
 class ArrowPainter extends CustomPainter {
   List<ArrowPainterItem> itemList;
 
-  ArrowPainter(this.itemList);
+  ArrowPainter(this.itemList, [this.width = 1]);
+  double width;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -29,14 +30,14 @@ class ArrowPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..strokeWidth = 2;
+      ..strokeWidth = width;
 
     /// Draw a single arrow.
     for (var item in itemList) {
       Path path = Path();
       path.moveTo(item.sx, item.sy);
-      path.relativeCubicTo(0, 0, (item.dx - item.sx) * 0.5, (item.dy - item.sy) * 0.02, item.dx - item.sx, item.dy - item.sy);
-      path = ArrowPath.make(path: path);
+      path.relativeCubicTo(0, 0, (item.dx - item.sx) * 0.75, (item.dy - item.sy) * 0.25, item.dx - item.sx, item.dy - item.sy);
+      path = ArrowPath.make(path: path, tipLength: 7);
       canvas.drawPath(path, paint..color = item.color);
 
       // final TextSpan textSpan = TextSpan(

@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:helpers/helpers.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:the_long_dark_info/core/style.dart';
+import 'package:the_long_dark_info/global_widgets/card_scroll_viewer.dart';
+import 'package:the_long_dark_info/global_widgets/image_list_viewer.dart';
 import 'package:tphoto_view/photo_view.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:math' as math;
@@ -19,6 +21,7 @@ import '../../core/dialogs.dart';
 import '../../core/utils.dart';
 import '../../global_widgets/arrow_painter.dart';
 import '../../global_widgets/gesture_zoom_box.dart';
+import '../../global_widgets/image_scroll_viewer.dart';
 import '../../service/api_service.dart';
 import '../../service/local_service.dart';
 
@@ -197,28 +200,29 @@ class MapScreenController extends GetxController {
       var dy = DBL(item['end']['y']);
       return Stack(
         children: [
-          if (sx > 0 && sy > 0 && dx > 0 && dy > 0)...[
-            IgnorePointer(
-                child: CustomPaint(
-                  size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
-                  painter: ArrowPainter([ArrowPainterItem(sx, sy, dx, dy, Colors.red)]),
-                )
-            ),
+          if (AppData.isMementoShow)...[
+            if (sx > 0 && sy > 0 && dx > 0 && dy > 0)...[
+              IgnorePointer(
+                  child: CustomPaint(
+                    size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
+                    painter: ArrowPainter([ArrowPainterItem(sx, sy, dx, dy, Colors.red)]),
+                  )
+              ),
+            ],
+            if (sx > 0 && sy > 0)...[
+              showMementoPin(context, 'start', index, onUpdate),
+              if (dx > 0 && dy > 0)...[
+                showMementoPin(context, 'end', index, onUpdate),
+              ]
+            ],
           ],
-          if (sx > 0 && sy > 0)...[
-            showMementoPin(context, index, true, onUpdate),
-            if (dx > 0 && dy > 0)...[
-              showMementoPin(context, index, false, onUpdate),
-            ]
-          ]
         ]
       );
     });
   }
 
-  showMementoPin(context, index, isStart, onUpdate) {
+  showMementoPin(context, type, index, onUpdate) {
     var item = AppData.mementoData[targetId]['data'][index];
-    var type = isStart ? 'start' : 'end';
     var sx = DBL(item[type]['x']);
     var sy = DBL(item[type]['y']);
     return Positioned(
@@ -227,7 +231,7 @@ class MapScreenController extends GetxController {
       child: GestureDetector(
         onTap: () {
           if (!AppData.isMemEditMode) {
-            showMementoInfo(context, index, item[type]);
+            showMementoInfo(context, type, item[type], STR(item['reward']));
           }
         },
         onPanStart: (detail) {
@@ -246,42 +250,85 @@ class MapScreenController extends GetxController {
         },
         child: Stack(
           children: [
-            Positioned(
-              left: -1,
-              top: -0.85,
-              child: Icon(Icons.place, size: 14, color: Colors.black),
-            ),
-            Icon(Icons.place, size: 12, color: index == 0 ? Colors.blue : Colors.green),
+            // Positioned(
+            //   left: -1,
+            //   top: -0.85,
+            //   child: Icon(type == 'start' ?  Icons.place : Icons.place, size: 14, color: Colors.black),
+            // ),
+            // Positioned(
+            //   left: 1,
+            //   top: 0.85,
+            //   child: Icon(Icons.circle, size: 8, color: Colors.black),
+            // ),
+            Icon(type == 'start' ?  Icons.place_rounded : Icons.place_rounded, size: 12, color: Colors.black),
+            Icon(type == 'start' ?  Icons.place_outlined : Icons.place_outlined, size: 12, color: index == 0 ? Colors.yellow : Colors.orange),
           ],
         ),
       ),
     );
   }
 
-  showMementoInfo(context, index, data) {
+  showMementoInfo(context, type, data, reward) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
+        var imageData = List.from(data['image']).map((item) => 'assets/memento/$item.png').toList();
         return Container(
-          height: 200,
-          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('Memento information'.tr, style: itemTitleStyle),
+          height: 240,
+          width: double.infinity,
+          padding: EdgeInsets.all(15),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text('MEMENTO'.tr, style: itemTitleStyle),
+              SizedBox(height: 20),
+              if (imageData.isNotEmpty)...[
+                ImageListViewer(
+                  imageData,
+                  itemHeight: 40,
+                  itemWidth: 40,
+                  onActionCallback: (index, status) {
+                    if (index >= 0) {
+                      showImageSlideDialog(context, imageData, index);
+                    }
+                  }
+                ),
+                SizedBox(height: 10),
+              ],
+              if (type == 'start')...[
                 Row(
                   children: [
-
-                    Text(DESC(data['desc'])),
-                  ]
-                ),
-                // ElevatedButton(
-                //   child: const Text('Close BottomSheet'),
-                //   onPressed: () => Navigator.pop(context),
-                // ),
+                    Icon(Icons.sticky_note_2_outlined, size: 24),
+                    SizedBox(width: 5),
+                    Text('Note'.tr, style: itemSubTitleStyle),
+                  ],
+                )
               ],
-            ),
+              if (type != 'start')...[
+                Row(
+                  children: [
+                    Icon(Icons.feedback_outlined, size: 24),
+                    SizedBox(width: 5),
+                    Text('Object'.tr, style: itemSubTitleStyle),
+                  ],
+                ),
+              ],
+              SizedBox(height: 10),
+              Text(DESC(data['desc']), style: itemDescStyle),
+              if (reward.isNotEmpty)...[
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Icon(Icons.card_giftcard, size: 24),
+                    SizedBox(width: 5),
+                    Text('Reward'.tr, style: itemSubTitleStyle),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Text(reward, style: itemDescStyle),
+              ]
+            ],
           ),
         );
       },

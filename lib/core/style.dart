@@ -25,6 +25,8 @@ TextStyle dialogDescTextErrorStyle = TextStyle(
 // item..
 TextStyle itemTitleStyle = TextStyle(
     fontSize: item_title_font_size, color: NAVY, fontWeight: FontWeight.w700);
+TextStyle itemSubTitleStyle = TextStyle(
+    fontSize: item_title_sub_font_size, color: NAVY, fontWeight: FontWeight.w700);
 TextStyle itemTitleInverseStyle = TextStyle(
     fontSize: item_title_font_size, color: Colors.white, fontWeight: FontWeight.w700);
 TextStyle itemTitleInfoStyle = TextStyle(
@@ -35,6 +37,8 @@ TextStyle itemTitleColorStyle = TextStyle(
     fontSize: item_title_font_size, color: Colors.deepPurple, fontWeight: FontWeight.w700);
 TextStyle itemDescStyle = TextStyle(
     fontSize: item_desc_font_size, color: Colors.black54, fontWeight: FontWeight.w600);
+TextStyle itemDescLinkStyle = TextStyle(
+    fontSize: item_desc_font_size, color: Colors.blue, fontWeight: FontWeight.w400, decoration: TextDecoration.underline);
 
 // pin..
 TextStyle pinTitleStyle = TextStyle(

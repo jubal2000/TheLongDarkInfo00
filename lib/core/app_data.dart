@@ -18,8 +18,8 @@ class AppData {
   static JSON listSelectData = {};
 
   static bool isPinShow = true;
-  static bool isMementoShow = true;
-  static bool isDevMode = true;
+  static bool isMementoShow = false;
+  static bool isDevMode = false;
   static bool isLinkEditMode = false;
   static bool isMemEditMode = false;
 }
