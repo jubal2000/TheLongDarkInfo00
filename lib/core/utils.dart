@@ -619,23 +619,10 @@ class DropdownItems {
               child: showHorizontalDivider(Size(double.infinity, 2), color: Colors.grey),
             )
           ]
-          // Divider(
-          //   height: 2,
-          //   thickness: 2,
-          //   color: Colors.grey.withOpacity(0.5),
-          //   indent: 0,
-          //   endIndent: 0,
-          // ),
         ]
     );
   }
 }
-//
-// extension GestureZoomBoxHelper on GestureZoomBox {
-//   onScaleChanged() {
-//
-//   }
-// }
 
 class Tile extends StatelessWidget {
   Tile({
@@ -687,13 +674,6 @@ class Tile extends StatelessWidget {
               // Text('$index', style: titleStyle),
             ],
           )
-          // child: CircleAvatar(
-          //   minRadius: 20,
-          //   maxRadius: 20,
-          //   backgroundColor: Colors.white,
-          //   foregroundColor: Colors.black,
-          //   child: Text('$index', style: const TextStyle(fontSize: 20)),
-          // ),
         ),
       )
     );
@@ -766,9 +746,14 @@ class IceTile extends StatelessWidget {
                       Text(title!, style: titleStyle, textAlign: TextAlign.center),
                     ],
                     if (mapInfo != null)...[
-                      Text(STR(mapInfo!['title_kr']), style: titleStyle, textAlign: TextAlign.center),
-                      SizedBox(height: 3),
-                      Text(STR(mapInfo!['title']), style: titleExStyle, textAlign: TextAlign.center),
+                      if (Get.locale.toString() == 'ko_KR')...[
+                        Text(STR(mapInfo!['title_kr']), style: titleStyle, textAlign: TextAlign.center),
+                        SizedBox(height: 3),
+                        Text(STR(mapInfo!['title']), style: titleExStyle, textAlign: TextAlign.center),
+                      ],
+                      if (Get.locale.toString() != 'ko_KR')...[
+                        Text(STR(mapInfo!['title']), style: titleStyle, textAlign: TextAlign.center),
+                      ]
                     ],
                     SizedBox(height: 5),
                     // Text('$index', style: titleStyle),

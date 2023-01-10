@@ -3,6 +3,7 @@ import 'package:the_long_dark_info/core/utils.dart';
 
 const SCROLL_SPEED = 250;
 const APP_VERSION = '0.0.1';
+const ORG_SCREEN_WITH = 411;
 
 class AppData {
   static final AppData _singleton = AppData._internal();
@@ -22,6 +23,9 @@ class AppData {
   static bool isDevMode = false;
   static bool isLinkEditMode = false;
   static bool isMemEditMode = false;
+
+  static int? localDataVer;
+  static List<String>? localMapData;
 }
 
 const GameIcons = [
@@ -39,7 +43,6 @@ const GameIcons = [
   Icons.cabin,
   Icons.camera_alt,
   Icons.delete_forever,
-  Icons.dangerous,
   Icons.dangerous_outlined,
   Icons.edit,
   Icons.eco_rounded,
@@ -47,12 +50,10 @@ const GameIcons = [
   Icons.factory,
   Icons.feedback,
   Icons.festival,
-  Icons.garage,
   Icons.gite,
   Icons.gpp_good_rounded,
   Icons.grade,
   Icons.handyman,
-  Icons.health_and_safety,
   Icons.info,
   Icons.key_outlined,
   Icons.king_bed,
@@ -70,20 +71,14 @@ const GameIcons = [
   Icons.recycling,
   Icons.verified_sharp,
   Icons.warehouse_rounded,
-  Icons.water_damage,
   Icons.water_drop,
-  Icons.wb_cloudy,
   Icons.wb_incandescent,
   Icons.wb_sunny,
-  Icons.yard,
-  Icons.directions_car,
   Icons.directions_run,
   Icons.directions_walk,
   Icons.hotel,
   Icons.home_repair_service,
   Icons.liquor,
-  Icons.local_airport,
-  Icons.add_location,
   Icons.store,
   Icons.forest,
   Icons.hardware,

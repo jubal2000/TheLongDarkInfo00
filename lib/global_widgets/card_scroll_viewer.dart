@@ -69,7 +69,9 @@ class CardScrollViewer extends StatefulWidget {
         this.isCanDownload = false,
         this.selectText = '',
         this.selectedId = '',
+        this.backgroundColor = Colors.blueGrey,
         this.selectTextStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
+        this.imageColor,
         this.onActionCallback
       }) : super(key: key);
 
@@ -96,6 +98,9 @@ class CardScrollViewer extends StatefulWidget {
   bool   isImageExView;
   bool   isThumbShow;
   bool   isCanDownload;
+
+  Color?  imageColor;
+  Color  backgroundColor;
 
   Function(String, int)? onActionCallback; // key, status - 0: select, 1: add,  2: delete
 
@@ -159,6 +164,7 @@ class CardScrollViewerState extends State<CardScrollViewer> {
       // }
       _cardList = widget.itemList.entries.map((item) =>
           Container(
+              color: Colors.transparent,
               child: GestureDetector(
                   onLongPress: () {
                     if (!widget.isShowMenu) {
@@ -193,6 +199,7 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                         Container(
                             width: widget.itemWidth,
                             padding: EdgeInsets.symmetric(horizontal: widget.isVerticalScroll ? 0 : 2.5, vertical: widget.isVerticalScroll ? 5 : 0),
+                            color: Colors.transparent,
                             child: Column(
                                 children: [
                                   if (item.value['image'] != null || (widget.isThumbShow && item.value['thumb'] != null) || item.value['backPic'] != null || item.value['icon'] != null)
@@ -205,8 +212,8 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                                             ? Image.memory(item.value['thumb'], fit: widget.backFit) :
                                         item.value['image'] != null
                                             ? Image.memory(item.value['image'], fit: widget.backFit) :
-                                        item.value['icon'] != null ? Icon(GameIcons[INT(item.value['icon'])], size: widget.itemHeight) :
-                                        showImageWidget(item.value['backPic'], widget.backFit),
+                                        item.value['icon'] != null ? Icon(GameIcons[INT(item.value['icon'])], size: widget.itemHeight, color: widget.imageColor) :
+                                        showImageWidget(item.value['backPic'], widget.backFit, color: widget.imageColor),
                                       ),
                                     ),
                                   if (item.value['title'] != null)
@@ -396,6 +403,7 @@ class CardScrollViewerState extends State<CardScrollViewer> {
     if (widget.isVerticalScroll) {
       return Container(
           padding: widget.backgroundPadding,
+          color: widget.backgroundColor,
           child: Column(
             children: [
               if (widget.title.isNotEmpty)
@@ -423,6 +431,7 @@ class CardScrollViewerState extends State<CardScrollViewer> {
     } else {
       return Container(
           padding: widget.backgroundPadding,
+          color: widget.backgroundColor,
           child: Column(
             children: [
               if (widget.title.isNotEmpty)

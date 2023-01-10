@@ -28,6 +28,7 @@ class AppInformation extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  SizedBox(height: 40),
                   Image.asset(
                     'assets/ui/app_logo_01.png',
                     width: MediaQuery.of(context).size.width * 0.8,
@@ -56,15 +57,27 @@ class AppInformation extends StatelessWidget {
                     ),
                     SizedBox(height: 20),
                     InkWell(
-                      onTap: () async {
-                        await _launchUrl(Uri.parse(STR(AppData.startData['org_url']['map'])));
-                      },
-                      child: Column(
-                        children: [
-                          Text('Mapped by stmSantana', style: itemSubTitleStyle),
-                          Text(STR(AppData.startData['org_url']['map']), style: itemDescLinkStyle, textAlign: TextAlign.center),
-                        ],
-                      )
+                        onTap: () async {
+                          await _launchUrl(Uri.parse(STR(AppData.startData['org_url']['map_org'])));
+                        },
+                        child: Column(
+                          children: [
+                            Text('Original map creator - Whiteberry', style: itemSubTitleStyle),
+                            Text(STR(AppData.startData['org_url']['map_org']), style: itemDescLinkStyle, textAlign: TextAlign.center),
+                          ],
+                        )
+                    ),
+                    SizedBox(height: 20),
+                    InkWell(
+                        onTap: () async {
+                          await _launchUrl(Uri.parse(STR(AppData.startData['org_url']['map'])));
+                        },
+                        child: Column(
+                          children: [
+                            Text('Original map detail - Stray Wolf', style: itemSubTitleStyle),
+                            Text(STR(AppData.startData['org_url']['map']), style: itemDescLinkStyle, textAlign: TextAlign.center),
+                          ],
+                        )
                     ),
                     SizedBox(height: 20),
                     InkWell(

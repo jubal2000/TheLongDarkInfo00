@@ -8,6 +8,7 @@ import 'package:the_long_dark_info/service/firebase_service.dart';
 
 import '../core/app_data.dart';
 import '../core/utils.dart';
+import 'local_service.dart';
 
 class ApiService extends GetxService {
   Future<ApiService> init() async {
@@ -39,12 +40,41 @@ class ApiService extends GetxService {
   }
 
   Future<dynamic> getMapDataAll() async {
+    final serverDataVer = INT(AppData.startData['dataVersion']);
+    AppData.localDataVer ??= await StorageManager.readData('dataVersion');
+    final mapData = await StorageManager.readData('mapData');
+    if (mapData != null) {
+      AppData.localMapData ??= List<String>.from(mapData);
+    }
+    LOG('--> getMapDataAll : $serverDataVer / ${AppData.localDataVer} - ${AppData.localMapData}');
+    if (AppData.localMapData == null || AppData.localDataVer != serverDataVer) {
+      await getMapServerDataAll();
+      StorageManager.saveData('dataVersion', serverDataVer);
+    } else {
+      LOG('--> AppData.localMapData : ${AppData.localMapData!.length}');
+      AppData.mapData       = JSON.from(json.decode(AppData.localMapData![0]));
+      AppData.mapLinkData   = JSON.from(json.decode(AppData.localMapData![1]));
+      AppData.mapInsideData = JSON.from(json.decode(AppData.localMapData![2]));
+      AppData.linkData      = JSON.from(json.decode(AppData.localMapData![3]));
+      AppData.mementoData   = JSON.from(json.decode(AppData.localMapData![4]));
+    }
+    return {'result': 'done'};
+  }
+
+  getMapServerDataAll() async {
     await getMapData();
     await getMapLinkData();
     await getMapInsideData();
     await getLinkData();
-    var result = await getMementoData();
-    return result;
+    await getMementoData();
+    List<String> localDataList = [];
+    localDataList.add(json.encode(AppData.mapData));
+    localDataList.add(json.encode(AppData.mapLinkData));
+    localDataList.add(json.encode(AppData.mapInsideData));
+    localDataList.add(json.encode(AppData.linkData));
+    localDataList.add(json.encode(AppData.mementoData));
+    StorageManager.saveData('mapData', localDataList);
+    LOG('--> getMapServerDataAll [${INT(AppData.startData['dataVersion'])}] : $localDataList');
   }
 
   Future<dynamic> getMapData() async {

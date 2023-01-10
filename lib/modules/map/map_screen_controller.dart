@@ -34,21 +34,19 @@ class MapScreenController extends GetxController {
   final PhotoViewController photoViewController = PhotoViewController();
   final offset = 20.0;
   final iconSize = 30.0;
+  final mementoMax = 2;
 
   List<JSON> targetList = [];
   JSON targetInfo = {};
+  JSON linkEditInfo = {};
   String targetId = '';
-  var targetIndex = 0;
 
-  var pinSize = 5.0;
+  var targetIndex = 0;
+  var pinSize = 7.0;
   var isDragOn = '';
   var mapScale = 1.0;
   var linkEditStep = 0;
-  JSON linkEditInfo = {};
-
-  var  mementoIndex = 0;
-  final mementoMax = 2;
-
+  var mementoIndex = 0;
   var memTypeN = ['start', 'end'];
 
   @override
@@ -142,7 +140,6 @@ class MapScreenController extends GetxController {
       item['end']['y'] = detail.localPosition.dy;
       mementoIndex++;
     }
-    LOG('--> $item');
   }
 
   showMementoDialog(context, index, onUpdate) {
@@ -168,19 +165,6 @@ class MapScreenController extends GetxController {
     LOG('--> uploadMementoData ready [$targetId] : ${AppData.mementoData[targetId]['data']}');
     showLoadingDialog(context, 'Uploading now...'.tr);
     Future.delayed(Duration(milliseconds: 200), () {
-      // AppData.mementoData[targetId]['data'].forEach((item) {
-      //   typeN.map((type) async {
-      //     LOG('--> $type : ${item[type]['imageLocal']}');
-      //   if (item[type]['imageLocal'] != null) {
-      //       var imageData = await ReadFileByte(item[type]['imageLocal']);
-      //       JSON imageInfo = {'id': Uuid().v1().toString(), 'image': imageData};
-      //       var path = await api.uploadImageData(imageInfo, 'memento_img');
-      //       item[type]['image'] = path;
-      //       item[type].delete('imageLocal');
-      //     }
-      //   });
-      // });
-      // LOG('--> uploadMementoData start [$targetId] : ${AppData.mementoData[targetId]}');
       api.addMementoData(AppData.mementoData[targetId]).then((upResult) {
         if (upResult != null) {
           AppData.mementoData[targetId] = upResult;
@@ -194,26 +178,26 @@ class MapScreenController extends GetxController {
     return List.generate(2, (index) {
       var item = AppData.mementoData[targetId]['data'][index];
       LOG('--> showMementoMark [$index] : $item');
-      var sx = DBL(item['start']['x']);
-      var sy = DBL(item['start']['y']);
-      var dx = DBL(item['end']['x']);
-      var dy = DBL(item['end']['y']);
+      var sx = DBL(item['start']['x']) * Get.size.width / ORG_SCREEN_WITH;
+      var sy = DBL(item['start']['y']) * Get.size.width / ORG_SCREEN_WITH;
+      var dx = DBL(item['end']['x']) * Get.size.width / ORG_SCREEN_WITH;
+      var dy = DBL(item['end']['y']) * Get.size.width / ORG_SCREEN_WITH;
       return Stack(
         children: [
           if (AppData.isMementoShow)...[
-            if (sx > 0 && sy > 0 && dx > 0 && dy > 0)...[
-              IgnorePointer(
-                  child: CustomPaint(
-                    size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
-                    painter: ArrowPainter([ArrowPainterItem(sx, sy, dx, dy, Colors.red)]),
-                  )
-              ),
-            ],
             if (sx > 0 && sy > 0)...[
               showMementoPin(context, 'start', index, onUpdate),
               if (dx > 0 && dy > 0)...[
                 showMementoPin(context, 'end', index, onUpdate),
               ]
+            ],
+            if (sx > 0 && sy > 0 && dx > 0 && dy > 0)...[
+              IgnorePointer(
+                child: CustomPaint(
+                  size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
+                  painter: ArrowPainter([ArrowPainterItem(sx, sy, dx, dy, Colors.red)]),
+                )
+              ),
             ],
           ],
         ]
@@ -223,15 +207,15 @@ class MapScreenController extends GetxController {
 
   showMementoPin(context, type, index, onUpdate) {
     var item = AppData.mementoData[targetId]['data'][index];
-    var sx = DBL(item[type]['x']);
-    var sy = DBL(item[type]['y']);
+    var sx = DBL(item[type]['x']) * Get.size.width / ORG_SCREEN_WITH;
+    var sy = DBL(item[type]['y']) * Get.size.width / ORG_SCREEN_WITH;
     return Positioned(
       top: sy - 11,
       left: sx - 6,
       child: GestureDetector(
         onTap: () {
           if (!AppData.isMemEditMode) {
-            showMementoInfo(context, type, item[type], STR(item['reward']));
+            showMementoInfo(context, type, item[type], STR(item[Get.locale.toString() == 'ko_KR' ? 'reward_kr' : 'reward']), BOL(item['interloper']));
           }
         },
         onPanStart: (detail) {
@@ -250,16 +234,6 @@ class MapScreenController extends GetxController {
         },
         child: Stack(
           children: [
-            // Positioned(
-            //   left: -1,
-            //   top: -0.85,
-            //   child: Icon(type == 'start' ?  Icons.place : Icons.place, size: 14, color: Colors.black),
-            // ),
-            // Positioned(
-            //   left: 1,
-            //   top: 0.85,
-            //   child: Icon(Icons.circle, size: 8, color: Colors.black),
-            // ),
             Icon(type == 'start' ?  Icons.place_rounded : Icons.place_rounded, size: 12, color: Colors.black),
             Icon(type == 'start' ?  Icons.place_outlined : Icons.place_outlined, size: 12, color: index == 0 ? Colors.yellow : Colors.orange),
           ],
@@ -268,7 +242,7 @@ class MapScreenController extends GetxController {
     );
   }
 
-  showMementoInfo(context, type, data, reward) {
+  showMementoInfo(context, type, data, reward, [bool isInterloperOff = false]) {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -281,7 +255,7 @@ class MapScreenController extends GetxController {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('MEMENTO'.tr, style: itemTitleStyle),
+              Text('${'MEMENTO'.tr} ${isInterloperOff?'(Except interloper?)'.tr:''}', style: itemTitleStyle),
               SizedBox(height: 20),
               if (imageData.isNotEmpty)...[
                 ImageListViewer(
@@ -315,7 +289,7 @@ class MapScreenController extends GetxController {
                 ),
               ],
               SizedBox(height: 10),
-              Text(DESC(data['desc']), style: itemDescStyle),
+              Text(DESC(data[Get.locale.toString() == 'ko_KR' ? 'desc_kr' : 'desc']), style: itemDescStyle),
               if (reward.isNotEmpty)...[
                 SizedBox(height: 10),
                 Row(
@@ -333,10 +307,6 @@ class MapScreenController extends GetxController {
         );
       },
     );
-  }
-
-  uploadPinData(context) {
-
   }
 
   List<Widget> getPinListWidget(context, onUpdate) {
@@ -368,7 +338,9 @@ class MapScreenController extends GetxController {
                     if (isDragOn.isEmpty) {
                       showPinEditDialog(context, targetId, item).then((result) {
                         if (result['delete'] != null) {
-                          showAlertYesNoDialog(context, 'Delete'.tr, 'Delete this mark?', '', 'Cancel'.tr, 'OK'.tr).then((result2) {
+                          showAlertYesNoDialog(context, 'Delete'.tr,
+                              'Are you sure you want to delete it now?'.tr, '',
+                              'Cancel'.tr, 'OK'.tr).then((result2) {
                             if (result2 == 1) {
                               AppData.pinData[targetId]['data'].remove(item);
                               if (onUpdate != null) onUpdate();
@@ -428,7 +400,6 @@ class MapScreenController extends GetxController {
     return Container(
       width:  pinSize * 4,
       height: pinSize * 3,
-      // color: Colors.black12,
       child: Stack(
         children: [
           if (STR(item['icon']).isNotEmpty)...[
@@ -448,12 +419,12 @@ class MapScreenController extends GetxController {
                     Text(STR(item['title']), style: pinTitleStyle, textAlign: TextAlign.center),
                     Stack(
                       children: [
-                        Icon(Icons.circle, size: pinSize+1, color: Colors.black),
                         Positioned(
                           left: 0.5,
                           top: 0.5,
-                          child: Icon(GameIcons[iconIndex], size: pinSize, color: COL(item['color'])),
-                        )
+                          child: Icon(GameIcons[iconIndex], size: pinSize, color: Colors.black87),
+                        ),
+                        Icon(GameIcons[iconIndex], size: pinSize, color: COL(item['color'])),
                       ]
                     )
                   ]
@@ -485,7 +456,8 @@ class MapScreenController extends GetxController {
   }
 
   clearPinMark(context) async {
-    var result = await showAlertYesNoDialog(context, 'Clear'.tr, 'Clear this map pin marks?'.tr, '', 'Cancel'.tr, 'OK'.tr);
+    var result = await showAlertYesNoDialog(context, 'Clear'.tr,
+        'Are you sure you want to delete all markers on this map?'.tr, '', 'Cancel'.tr, 'OK'.tr);
     if (result == 1) {
       AppData.pinData[targetId]['data'] = [];
       await local.writeLocalData('pinData', AppData.pinData);
@@ -510,25 +482,10 @@ class MapScreenController extends GetxController {
     return AppData.pinData[targetId] != null && LIST_NOT_EMPTY(AppData.pinData[targetId]['data']);
   }
 
-  // showLinkListMark(item, Function()? onSelected, [bool isAddMode = false, bool isLinkEditMode = false]) {
-  //   return Positioned(
-  //     top: DBL(item['sy']),
-  //     left: DBL(item['sx']),
-  //     child: Container(
-  //       width: DBL(item['ex']) - DBL(item['sx']),
-  //       height: DBL(item['ey']) - DBL(item['sy']),
-  //       color: isAddMode ? Colors.green.withOpacity(0.75) : isLinkEditMode ? Colors.black45 : Colors.black12,
-  //       child: Center(
-  //         child: isLinkEditMode ? Text(STR(item['linkTitle_kr']), style: pinEditTitleStyle) : Container(),
-  //       )
-  //     ),
-  //   );
-  // }
-
   showLinkListMark(item, Function()? onSelected, [bool isAddMode = false, bool isLinkEditMode = false]) {
     return Positioned(
-      top: DBL(item['sy']),
-      left: DBL(item['sx']),
+      top: DBL(item['sy']) * Get.size.width / ORG_SCREEN_WITH,
+      left: DBL(item['sx']) * Get.size.width / ORG_SCREEN_WITH,
       child: PointerInterceptor(
         child: GestureDetector(
           onTap: () {
@@ -542,8 +499,8 @@ class MapScreenController extends GetxController {
             }
           },
           child: Container(
-            width: DBL(item['ex']) - DBL(item['sx']),
-            height: DBL(item['ey']) - DBL(item['sy']),
+            width: (DBL(item['ex']) - DBL(item['sx'])) * Get.size.width / ORG_SCREEN_WITH,
+            height: (DBL(item['ey']) - DBL(item['sy'])) * Get.size.width / ORG_SCREEN_WITH,
             color: isAddMode ? Colors.green.withOpacity(0.75) : isLinkEditMode ? Colors.black45 : Colors.black12,
             child: Center(
               child: Column(

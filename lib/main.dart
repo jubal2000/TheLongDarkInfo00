@@ -13,7 +13,6 @@ import 'package:the_long_dark_info/service/api_service.dart';
 import 'package:the_long_dark_info/service/firebase_service.dart';
 import 'package:flash/flash.dart';
 import 'package:the_long_dark_info/service/local_service.dart';
-import 'package:wakelock/wakelock.dart';
 
 import './routes.dart';
 import 'core/themes.dart';
@@ -31,9 +30,6 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 락 스크린 고정..
-  Wakelock.enable();
-
   //세로모드로 고정
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
@@ -45,17 +41,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    LOG('--> Get.locale : ${Get.locale.toString()}');
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       translations: Words(), // 번역들
       locale: Get.deviceLocale,
-      fallbackLocale: Locale('ko'), // 잘못된 지역이 선택된 경우 복구될 지역을 지정
+      fallbackLocale: Locale('en', 'US'), // 잘못된 지역이 선택된 경우 복구될 지역을 지정
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('ko', 'KO'),
+        Locale('ko', 'KR'),
         Locale('en', 'US'),
       ],
       theme: lightTheme,

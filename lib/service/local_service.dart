@@ -74,7 +74,7 @@ class StorageManager {
     } else if (value is List<String>) {
       prefs.setStringList(key, value);
     } else {
-      LOG("--> StorageManager error : Invalid Type");
+      LOG("--> StorageManager error : Invalid Type (${value.runtimeType})");
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:helpers/helpers/widgets/align.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -432,6 +433,12 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
     if (isNew) {
       jsonData['id'] = Uuid().v1().toString();
     }
+    // for (var i=0; i<131; i++) {
+    //   iconList['$i'] = {
+    //     'id': '$i',
+    //     'backPic': 'assets/icons/game/${i+1}.png',
+    //   };
+    // }
     for (var i=0; i<GameIcons.length; i++) {
       iconList['$i'] = {
         'id': '$i',
@@ -478,8 +485,20 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                             isSelectIcon = true;
                           });
                         },
-                        child: Icon(GameIcons[int.parse(STR(iconList[selectIcon]['icon']))], size: iconSize, color: selectColor)
-                          // showImage(STR(iconList[selectIcon]['backPic']), Size(iconSize, iconSize), selectColor),
+                        // child: Icon(GameIcons[int.parse(STR(iconList[selectIcon]['icon']))], size: iconSize, color: selectColor)
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 2,
+                              top: 2,
+                              child: Icon(GameIcons[int.parse(STR(iconList[selectIcon]['icon']))], size: iconSize, color: Colors.black87),
+                            ),
+                            Icon(GameIcons[int.parse(STR(iconList[selectIcon]['icon']))], size: iconSize, color: selectColor),
+                          ],
+                        )
+                        // child: iconList[selectIcon]['icon'] != null ?
+                        //   Icon(GameIcons[int.parse(STR(iconList[selectIcon]['icon']))], size: iconSize, color: selectColor) :
+                        //   showImage(STR(iconList[selectIcon]['backPic']), Size(iconSize, iconSize), selectColor),
                       ),
                     ],
                     if (isSelectIcon)...[
@@ -493,6 +512,7 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                           itemWidth: iconSize,
                           itemHeight: iconSize,
                           imageMax: 1,
+                          imageColor: Colors.white,
                           onActionCallback: (key, status) {
                             // LOG('--> icon select : $key / $status');
                             if (status == 1) {
@@ -510,7 +530,7 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                     SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
-                        showColorSelectorDialog(context, 'COLOR SELECT', selectColor).then((result) {
+                        showColorSelectorDialog(context, 'COLOR SELECT'.tr, selectColor).then((result) {
                           if (result == null) return;
                           setState(() {
                             jsonData['color'] = COL2STR(result);
@@ -528,7 +548,7 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                           borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
                         child: Center(
-                          child: Text('COLOR SELECT', style: itemDescStyle, textAlign: TextAlign.center),
+                          child: Text('COLOR SELECT'.tr, style: itemDescStyle, textAlign: TextAlign.center),
                         )
                         ,
                       ),
@@ -584,7 +604,7 @@ Future<JSON> showPinEditDialog(BuildContext context, String targetId, JSON pinDa
                 TextButton(
                   child: Text('OK'.tr),
                   onPressed: () {
-                    showLoadingDialog(context, 'writing now...'.tr);
+                    showLoadingDialog(context, 'Saving...'.tr);
                     Future.delayed(Duration(milliseconds: 200), () async {
                       LOG('--> add pin [$targetId] : $jsonData');
                       if (isNew) {
@@ -637,7 +657,7 @@ Future<JSON?> showMementoEditDialog(BuildContext context, String targetId, List<
               builder: (context, setState) {
                 return AlertDialog(
                   scrollable: true,
-                  title: Text(isNew ? 'Memento add'.tr : 'Memento info'.tr, style: dialogTitleTextStyle),
+                  title: Text(isNew ? 'Memento add'.tr : 'Memento edit'.tr, style: dialogTitleTextStyle),
                   insetPadding: EdgeInsets.all(15),
                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
                   backgroundColor: dialogBgColor,
@@ -701,7 +721,7 @@ Future<JSON?> showMementoEditDialog(BuildContext context, String targetId, List<
                               )
                             ),
                             SizedBox(height: 10),
-                            Text('Start info'.tr, style: dialogDescTextStyle),
+                            Text('Note'.tr, style: dialogDescTextStyle),
                             Row(
                               children: [
                                 Expanded(
@@ -739,7 +759,7 @@ Future<JSON?> showMementoEditDialog(BuildContext context, String targetId, List<
                               ],
                             ),
                             SizedBox(height: 10),
-                            Text('End info'.tr, style: dialogDescTextStyle),
+                            Text('Object'.tr, style: dialogDescTextStyle),
                             Row(
                               children: [
                                 Expanded(
@@ -784,7 +804,7 @@ Future<JSON?> showMementoEditDialog(BuildContext context, String targetId, List<
                               },
                             ),
                             SizedBox(height: 10),
-                            TextCheckBox(context, 'Including interloper', BOL(data[index]['interloper']), onChanged: (value) {
+                            TextCheckBox(context, 'Including interloper'.tr, BOL(data[index]['interloper']), onChanged: (value) {
                               setState(() {
                                 data[index]['interloper'] = value ? '1' : '';
                               });
@@ -1046,7 +1066,7 @@ Future showLinkSelectDialog(BuildContext context, String targetId, {bool isInsid
     builder: (BuildContext context) {
       return PointerInterceptor(
         child: AlertDialog(
-          title: Text('Link select'.tr, style: dialogTitleTextStyle),
+          title: Text('Select connection map'.tr, style: dialogTitleTextStyle),
           contentPadding: EdgeInsets.fromLTRB(10, 20, 10, 0),
           insetPadding: EdgeInsets.symmetric(horizontal: 10),
           backgroundColor: dialogBgColor,

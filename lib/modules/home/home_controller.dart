@@ -15,7 +15,7 @@ class HomeController extends GetxController {
   var mapScale = 1.0;
 
   Future<dynamic> getMapData() async {
-    return await api.getMapData();
+    return await api.getMapDataAll();
   }
 
   showAppInformation() {

@@ -42,9 +42,14 @@ Widget mainListItem(JSON itemInfo, [Function()? onSelect]) {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(STR(itemInfo['titleEx_kr'] ?? itemInfo['title_kr']), style: itemTitleStyle, maxLines: 2),
-                          SizedBox(height: 3),
-                          Text(STR(itemInfo['titleEx'] ?? itemInfo['title']).toUpperCase(), style: itemTitleInfoStyle, maxLines: 2),
+                          if (Get.locale.toString() == 'ko_KR')...[
+                            Text(STR(itemInfo['title_kr']), style: itemTitleStyle, textAlign: TextAlign.center),
+                            SizedBox(height: 3),
+                            Text(STR(itemInfo['title']), style: itemDescStyle, textAlign: TextAlign.center),
+                          ],
+                          if (Get.locale.toString() != 'ko_KR')...[
+                            Text(STR(itemInfo['title']), style: itemTitleStyle, textAlign: TextAlign.center),
+                          ]
                         ]
                     ),
                     Icon(Icons.arrow_forward_ios, size: 24, color: Colors.black12),

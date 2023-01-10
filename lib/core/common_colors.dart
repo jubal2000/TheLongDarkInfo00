@@ -64,7 +64,7 @@ const MaterialColor YELLOW = MaterialColor(
   },
 );
 
-const Color UPBIT_COLOR = Color(0xFF0062df);
+const Color PRIMERY_COLOR = Color(0xFF0062df);
 const Color COINONE_COLOR = Color(0xFF4987ff);
 const Color BITHUMB_COLOR = Color(0xFFfeab34);
 const Color BINANCE_COLOR = Color(0xFFF8D12F);
