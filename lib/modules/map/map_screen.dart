@@ -1,14 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fab_circular_menu/fab_circular_menu.dart';
-// import 'package:gesture_zoom_box/gesture_zoom_box.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:helpers/helpers/widgets/align.dart';
 import 'package:the_long_dark_info/service/api_service.dart';
-import 'package:the_long_dark_info/service/firebase_service.dart';
-import 'package:tphoto_view/photo_view.dart';
-import 'package:uuid/uuid.dart';
-import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 import '../../core/app_data.dart';
 import '../../core/common_sizes.dart';
@@ -16,7 +9,7 @@ import '../../core/dialogs.dart';
 import '../../core/style.dart';
 import '../../core/utils.dart';
 import '../../global_widgets/gesture_zoom_box.dart';
-import '../../routes.dart';
+import '../../helper/fab_circular_menu.dart';
 import 'map_screen_controller.dart';
 
 class MapScreen extends GetView<MapScreenController> {
