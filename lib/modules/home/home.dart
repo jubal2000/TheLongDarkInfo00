@@ -23,7 +23,7 @@ import '../map/map_screen_controller.dart';
 import 'home_controller.dart';
 
 class Home extends GetView<HomeController> {
-  Home({Key? key}) : super(key: key);
+  const Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

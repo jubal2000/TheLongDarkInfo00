@@ -46,10 +46,8 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const API_KEY = 'AIzaSyDJf1tyznBdHw1cVzCY0WOc5FeuiswL0cM';
-
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: API_KEY,
+    apiKey: 'AIzaSyDJf1tyznBdHw1cVzCY0WOc5FeuiswL0cM',
     appId: '1:691007032710:web:aa812d2d3b6b885b4ab007',
     messagingSenderId: '691007032710',
     projectId: 'kspot-001',
@@ -59,7 +57,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: API_KEY,
+    apiKey: 'AIzaSyDJf1tyznBdHw1cVzCY0WOc5FeuiswL0cM',
     appId: '1:786709934544:android:d3098cd26efe5344eb89d5',
     messagingSenderId: '786709934544',
     projectId: 'thelongdarkinfo00',
@@ -67,14 +65,14 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAKO6EYT2DZS50Gkf2DMyCdFZrG-b3gFII',
-    appId: '1:691007032710:ios:703f1b82b7d8ed874ab007',
-    messagingSenderId: '691007032710',
-    projectId: 'kspot-001',
-    storageBucket: 'kspot-001.appspot.com',
-    androidClientId: '691007032710-1btr37h5hq9an3475ie6vg0vnok9k94d.apps.googleusercontent.com',
-    iosClientId: '691007032710-kql8lqqrc831isirs74igptvpdqfgesf.apps.googleusercontent.com',
-    iosBundleId: 'com.jhfactory.kspot001',
+    apiKey: 'AIzaSyBgRBi67fPmcPz0b4sfbXtNZroi7yNL-2U',
+    appId: '1:786709934544:ios:3601c550d78e4781eb89d5',
+    messagingSenderId: '786709934544',
+    projectId: 'thelongdarkinfo00',
+    storageBucket: 'thelongdarkinfo00.appspot.co',
+    androidClientId: 'com.googleusercontent.apps.786709934544-9p113pp853ksrn6ocl6pbjnl01vu8fs6',
+    iosClientId: '786709934544-9p113pp853ksrn6ocl6pbjnl01vu8fs6.apps.googleusercontent.com',
+    iosBundleId: 'com.jhfactory.tld-info-00',
   );
 }
 

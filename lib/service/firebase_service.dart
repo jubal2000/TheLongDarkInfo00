@@ -24,8 +24,8 @@ class FirebaseService extends GetxService {
 
   FirebaseStorage?  firesStorage;
   FirebaseFirestore? firestore;
-  FirebaseFunctions? firefunctions;
-  FirebaseMessaging? firemessaging;
+  // FirebaseFunctions? firefunctions;
+  // FirebaseMessaging? firemessaging;
 
   String? token;
   String? recommendCode;
@@ -125,15 +125,15 @@ class FirebaseService extends GetxService {
   void onMessageOpenedAppListener(event) {
   }
 
-  void subscribeTopic() {
-    final appData = GetStorage();
-    final notice = appData.read('notice') ?? true;
-    if (notice) {
-      firemessaging!.subscribeToTopic('All');
-    } else {
-      firemessaging!.unsubscribeFromTopic('All');
-    }
-  }
+  // void subscribeTopic() {
+  //   final appData = GetStorage();
+  //   final notice = appData.read('notice') ?? true;
+  //   if (notice) {
+  //     firemessaging!.subscribeToTopic('All');
+  //   } else {
+  //     firemessaging!.unsubscribeFromTopic('All');
+  //   }
+  // }
 
   // Future<String> getDynamicLinkUrlString(String memberCode) async {
   //   final DynamicLinkParameters parameters = DynamicLinkParameters(
@@ -192,47 +192,8 @@ class FirebaseService extends GetxService {
   //   }
   // }
 
-  final coinIcons = [
-    'abc',
-    'ada',
-    'ankr',
-    'axl',
-    'btc',
-    'cot',
-    'dash',
-    'default',
-    'dsp',
-    'eos',
-    'eth',
-    'exc',
-    'h3c',
-    'hnc',
-    'ltc',
-    'mas',
-    'ohc',
-    'pic',
-    'poltn',
-    'polt',
-    'trx',
-    'udia',
-    'xhi',
-    'xlm',
-    'xrp',
-    'sketch',
-    'sket',
-  ];
-
   void showReceiveLocalNotificationDialog(
       BuildContext context, int id, String title, String body, String payload) async {
-    var showIcon = '';
-    for (var item in coinIcons) {
-      if (body.toLowerCase().contains(item)) {
-        showIcon = '/assets/img/coin/$item.png';
-        break;
-      }
-    }
-    print('--> showIcon : $showIcon');
-
     // display a dialog with the notification details, tap ok to go to another page
     showDialog(
       context: context,
@@ -240,8 +201,6 @@ class FirebaseService extends GetxService {
         title: Text(title),
         content: Row(
           children: [
-            if (showIcon.isNotEmpty)
-            Image(image: AssetImage(showIcon), width: 32, height: 32, fit: BoxFit.fitHeight),
             Text(body),
           ],
         ),

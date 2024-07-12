@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:fab_circular_menu_plus/fab_circular_menu_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -10,8 +11,6 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:the_long_dark_info/core/style.dart';
 import 'package:the_long_dark_info/global_widgets/card_scroll_viewer.dart';
 import 'package:the_long_dark_info/global_widgets/image_list_viewer.dart';
-import 'package:uuid/uuid.dart';
-import 'dart:math' as math;
 
 
 import '../../core/app_data.dart';
@@ -21,6 +20,7 @@ import '../../core/utils.dart';
 import '../../global_widgets/arrow_painter.dart';
 import '../../global_widgets/gesture_zoom_box.dart';
 import '../../global_widgets/image_scroll_viewer.dart';
+import '../../helper/fab_circular_menu.dart';
 import '../../service/api_service.dart';
 import '../../service/local_service.dart';
 
@@ -30,7 +30,7 @@ class MapScreenController extends GetxController {
 
   final GlobalKey<FabCircularMenuPlusState> fabKey = GlobalKey();
   final GlobalKey<GestureZoomBoxState> zoomKey = GlobalKey();
-  final PhotoViewController photoViewController = PhotoViewController();
+  // final PhotoViewController photoViewController = PhotoViewController();
   final offset = 20.0;
   final iconSize = 30.0;
   final mementoMax = 2;
