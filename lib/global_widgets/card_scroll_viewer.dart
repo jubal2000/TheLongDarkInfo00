@@ -220,7 +220,7 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                                     Container(
                                       height: widget.textHeight,
                                       padding: EdgeInsets.only(top: 5),
-                                      child: Text(STR(item.value['title']), style: Theme.of(context).textTheme.headline5!, maxLines: null),
+                                      child: Text(STR(item.value['title']), style: Theme.of(context).textTheme.headlineMedium, maxLines: null),
                                     )
                                 ]
                             )
@@ -259,7 +259,7 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                                     if (item.value['nickName'] != null) ...[
                                       Padding(
                                         padding: EdgeInsets.only(left: 5, bottom: 5),
-                                        child: Text(STR(item.value['nickName']), style: Theme.of(context).textTheme.subtitle1, maxLines: 2),
+                                        child: Text(STR(item.value['nickName']), style: Theme.of(context).textTheme.titleSmall, maxLines: 2),
                                       )
                                     ],
                                     // if (item.value['name'] != null) ...[
@@ -293,7 +293,7 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                                     color: Colors.white,
                                   ),
                                   SizedBox(width: 5),
-                                  Text(STR(item.value['linkTitle']), style:Theme.of(context).textTheme.bodyText1!, maxLines: 4),
+                                  Text(STR(item.value['linkTitle']), style:Theme.of(context).textTheme.bodyMedium, maxLines: 4),
                                 ],
                               ),
                             ),
@@ -309,8 +309,20 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                                       Icon(Icons.settings_sharp, color: Colors.white, size: 24),
                                     ]
                                 ),
-                                buttonPadding: EdgeInsets.zero,
-                                dropdownPadding: EdgeInsets.zero,
+                                buttonStyleData: ButtonStyleData(
+                                  width: 30,
+                                  height: 30,
+                                  padding: EdgeInsets.zero,
+                                ),
+                                dropdownStyleData: DropdownStyleData(
+                                  width: 140,
+                                  padding: EdgeInsets.zero,
+                                  offset: Offset(0, 8),
+                                ),
+                                menuItemStyleData: MenuItemStyleData(
+                                  height: 45,
+                                  padding: EdgeInsets.only(left: 16, right: 16),
+                                ),
                                 items: [
                                   ...DropdownItems.bannerEditItems.map(
                                         (item) =>
@@ -349,12 +361,6 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                                       onSelected(item.key, 2);
                                   }
                                 },
-                                itemHeight: 45,
-                                dropdownWidth: 140,
-                                buttonHeight: 30,
-                                buttonWidth: 30,
-                                itemPadding: const EdgeInsets.only(left: 16, right: 16),
-                                offset: const Offset(0, 8),
                               ),
                             ),
                           ),
@@ -375,7 +381,7 @@ class CardScrollViewerState extends State<CardScrollViewer> {
                 onSelected('', 1);
               },
               style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor.withOpacity(0.25),
+                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.25),
                   minimumSize: Size.zero, // Set this
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(

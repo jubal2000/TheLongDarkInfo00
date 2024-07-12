@@ -1,16 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:fab_circular_menu/fab_circular_menu.dart';
+import 'package:fab_circular_menu_plus/fab_circular_menu_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:helpers/helpers.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:the_long_dark_info/core/style.dart';
 import 'package:the_long_dark_info/global_widgets/card_scroll_viewer.dart';
 import 'package:the_long_dark_info/global_widgets/image_list_viewer.dart';
-import 'package:tphoto_view/photo_view.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:math' as math;
 
@@ -29,7 +28,7 @@ class MapScreenController extends GetxController {
   final api   = Get.find<ApiService>();
   final local = Get.find<LocalService>();
 
-  final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
+  final GlobalKey<FabCircularMenuPlusState> fabKey = GlobalKey();
   final GlobalKey<GestureZoomBoxState> zoomKey = GlobalKey();
   final PhotoViewController photoViewController = PhotoViewController();
   final offset = 20.0;
@@ -172,6 +171,11 @@ class MapScreenController extends GetxController {
         Navigator.of(dialogContext!).pop();
       });
     });
+  }
+
+  get hasMementoData {
+    LOG('--> hasMementoData [$targetId] : ${AppData.mementoData.containsKey(targetId)}');
+    return AppData.mementoData.containsKey(targetId);
   }
 
   showMementoMark(context, onUpdate) {
@@ -404,7 +408,8 @@ class MapScreenController extends GetxController {
         children: [
           if (STR(item['icon']).isNotEmpty)...[
             if (!AppData.isPinShow)...[
-              BottomCenterAlign(
+              Align(
+                alignment: Alignment.bottomCenter,
                 child: Padding(
                   padding: EdgeInsets.only(bottom: pinSize * 0.5),
                   child: Icon(Icons.circle, size: pinSize * 0.5, color: isDragOn ? Colors.red : COL(item['color'])),
@@ -433,7 +438,8 @@ class MapScreenController extends GetxController {
             ]
           ],
           if (STR(item['icon']).isEmpty)...[
-            BottomCenterAlign(
+            Align(
+              alignment: Alignment.bottomCenter,
               child: Icon(Icons.circle, size: pinSize * 0.2, color: isDragOn ? Colors.red : COL(item['color'])),
             ),
             if (AppData.isPinShow)...[
@@ -503,7 +509,9 @@ class MapScreenController extends GetxController {
             height: (DBL(item['ey']) - DBL(item['sy'])) * Get.size.width / ORG_SCREEN_WITH,
             color: isAddMode ? Colors.green.withOpacity(0.75) : isLinkEditMode ? Colors.black45 : Colors.black12,
             child: Center(
-              child: Column(
+              child: INT(item['status']) == 2 ?
+              Text(STR(item['linkTitle_kr']), style: linkTitleStyle, textAlign: TextAlign.center) :
+              Column(
                 children: [
                   isAddMode || isLinkEditMode ? Text(STR(item['linkTitle_kr']), style: pinEditTitleStyle) : Container(),
                   isLinkEditMode ? Text(STR(item['id']).toString().substring(0, 3), style: pinEditTitleStyle) : Container(),

@@ -137,8 +137,20 @@ class ImageListViewerState extends State<ImageListViewer> {
                                       Icon(Icons.settings_sharp, color: Colors.white, size: 24),
                                     ]
                                 ),
-                                buttonPadding: EdgeInsets.zero,
-                                dropdownPadding: EdgeInsets.zero,
+                                buttonStyleData: ButtonStyleData(
+                                  width: 30,
+                                  height: 30,
+                                  padding: EdgeInsets.zero,
+                                ),
+                                dropdownStyleData: DropdownStyleData(
+                                  width: 140,
+                                  padding: EdgeInsets.zero,
+                                  offset: Offset(0, 8),
+                                ),
+                                menuItemStyleData: MenuItemStyleData(
+                                  height: 45,
+                                  padding: EdgeInsets.only(left: 16, right: 16),
+                                ),
                                 items: [
                                   ...DropdownItems.bannerEditItems.map(
                                         (item) =>
@@ -157,12 +169,6 @@ class ImageListViewerState extends State<ImageListViewer> {
                                       onSelected(widget.itemList.indexOf(item), 2);
                                   }
                                 },
-                                itemHeight: 45,
-                                dropdownWidth: 140,
-                                buttonHeight: 30,
-                                buttonWidth: 30,
-                                itemPadding: const EdgeInsets.only(left: 16, right: 16),
-                                offset: const Offset(0, 8),
                               ),
                             ),
                           ),
@@ -182,7 +188,7 @@ class ImageListViewerState extends State<ImageListViewer> {
                 onSelected(-1, 1);
               },
               style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor.withOpacity(0.25),
+                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.25),
                   minimumSize: Size.zero, // Set this
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(

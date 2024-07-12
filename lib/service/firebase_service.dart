@@ -2,7 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+// import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -135,78 +135,62 @@ class FirebaseService extends GetxService {
     }
   }
 
-  Future<String> getDynamicLinkUrlString(String memberCode) async {
-    // final DynamicLinkParameters parameters = DynamicLinkParameters(
-    //   uriPrefix: 'https://link.sketchwallet.io',
-    //   link: Uri.parse('https://link.sketchwallet.io/link/?rc=$memberCode'),
-    //   androidParameters: AndroidParameters(
-    //     packageName: 'com.sketch.wallet',
-    //     // minimumVersion: 125,
-    //   ),
-    //   iosParameters: IosParameters(
-    //     bundleId: 'com.sketch-wallet.ios',
-    //     appStoreId: '1597866658',
-    //     // minimumVersion: '1.0.0',
-    //   ),
-    // );
-    //
-    // final shortLink = await parameters.buildShortLink();
-    // return shortLink.shortUrl.toString();
-    final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: 'https://link.sketchwallet.io',
-      link: Uri.parse('https://link.sketchwallet.io/link/?rc=$memberCode'),
-      androidParameters: AndroidParameters(
-        packageName: 'com.sketch.wallet',
-        // minimumVersion: 125,
-      ),
-      iosParameters: IOSParameters(
-        bundleId: 'com.sketch-wallet.ios',
-        appStoreId: '1597866658',
-        // minimumVersion: '1.0.0',
-      ),
-    );
-
-    final dynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
-    return dynamicLink.shortUrl.toString();
-  }
-
-  void initDynamicLinks() async {
-    FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
-      print('--> dynamicLinkData.link data : $dynamicLinkData');
-      recommendCode = dynamicLinkData.link.queryParameters['rc'] ?? '';
-    }).onError((error) {
-      print('--> dynamicLinkData.link error : $error');
-    });
-
-    // FirebaseDynamicLinks.instance.onLink(
-    //     onSuccess: onLinkSuccessListener,
-    //     onError: (OnLinkErrorException e) async {
-    //       print('onLinkError');
-    //       print(e.message);
-    //     });
-
-    // start 앱스토어를 통해 설치해서 온경우 수신??
-    final PendingDynamicLinkData? data =
-        await FirebaseDynamicLinks.instance.getInitialLink();
-    final Uri? deepLink = data?.link;
-
-    if (deepLink != null) {
-      recommendCode = deepLink.queryParameters['rc'];
-      print(
-          "deepLink.queryParameters['rc']: ${deepLink.queryParameters['rc']}");
-    }
-    // end
-  }
-
-  Future<dynamic> onLinkSuccessListener(
-      PendingDynamicLinkData? dynamicLink) async {
-    final Uri? deepLink = dynamicLink?.link;
-    if (deepLink != null) {
-      recommendCode = deepLink.queryParameters['rc'];
-      print(
-          "deepLink.queryParameters['rc']: ${deepLink.queryParameters['rc']}");
-    }
-  }
+  // Future<String> getDynamicLinkUrlString(String memberCode) async {
+  //   final DynamicLinkParameters parameters = DynamicLinkParameters(
+  //     uriPrefix: 'https://link.sketchwallet.io',
+  //     link: Uri.parse('https://link.sketchwallet.io/link/?rc=$memberCode'),
+  //     androidParameters: AndroidParameters(
+  //       packageName: 'com.sketch.wallet',
+  //       // minimumVersion: 125,
+  //     ),
+  //     iosParameters: IOSParameters(
+  //       bundleId: 'com.sketch-wallet.ios',
+  //       appStoreId: '1597866658',
+  //       // minimumVersion: '1.0.0',
+  //     ),
+  //   );
+  //
+  //   final dynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+  //   return dynamicLink.shortUrl.toString();
+  // }
+  //
+  // void initDynamicLinks() async {
+  //   FirebaseDynamicLinks.instance.onLink.listen((dynamicLinkData) {
+  //     print('--> dynamicLinkData.link data : $dynamicLinkData');
+  //     recommendCode = dynamicLinkData.link.queryParameters['rc'] ?? '';
+  //   }).onError((error) {
+  //     print('--> dynamicLinkData.link error : $error');
+  //   });
+  //
+  //   // FirebaseDynamicLinks.instance.onLink(
+  //   //     onSuccess: onLinkSuccessListener,
+  //   //     onError: (OnLinkErrorException e) async {
+  //   //       print('onLinkError');
+  //   //       print(e.message);
+  //   //     });
+  //
+  //   // start 앱스토어를 통해 설치해서 온경우 수신??
+  //   final PendingDynamicLinkData? data =
+  //       await FirebaseDynamicLinks.instance.getInitialLink();
+  //   final Uri? deepLink = data?.link;
+  //
+  //   if (deepLink != null) {
+  //     recommendCode = deepLink.queryParameters['rc'];
+  //     print(
+  //         "deepLink.queryParameters['rc']: ${deepLink.queryParameters['rc']}");
+  //   }
+  //   // end
+  // }
+  //
+  // Future<dynamic> onLinkSuccessListener(
+  //     PendingDynamicLinkData? dynamicLink) async {
+  //   final Uri? deepLink = dynamicLink?.link;
+  //   if (deepLink != null) {
+  //     recommendCode = deepLink.queryParameters['rc'];
+  //     print(
+  //         "deepLink.queryParameters['rc']: ${deepLink.queryParameters['rc']}");
+  //   }
+  // }
 
   final coinIcons = [
     'abc',

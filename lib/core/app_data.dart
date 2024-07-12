@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:the_long_dark_info/core/utils.dart';
 
+const APP_VERSION = '0.0.2';
 const SCROLL_SPEED = 250;
-const APP_VERSION = '0.0.1';
 const ORG_SCREEN_WITH = 411;
 
 class AppData {
@@ -20,9 +20,9 @@ class AppData {
 
   static bool isPinShow = true;
   static bool isMementoShow = false;
-  static bool isDevMode = false;
   static bool isLinkEditMode = false;
   static bool isMemEditMode = false;
+  static bool isDevMode = false;
 
   static int? localDataVer;
   static List<String>? localMapData;

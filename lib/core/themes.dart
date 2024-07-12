@@ -6,7 +6,7 @@ import '../core/common_sizes.dart';
 final ThemeData lightTheme = ThemeData(
     scaffoldBackgroundColor: Colors.white,
     primarySwatch: NAVY,
-    primaryColorBrightness: Brightness.light,
+    // primaryColorBrightness: Brightness.light,
     appBarTheme: AppBarTheme(
       systemOverlayStyle: SystemUiOverlayStyle.dark,
       iconTheme: IconThemeData(color: Colors.black),
@@ -33,8 +33,7 @@ final ThemeData lightTheme = ThemeData(
     )),
     outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-      primary: NAVY,
-      elevation: 0,
+      foregroundColor: NAVY, elevation: 0,
       side: BorderSide(color: NAVY, width: 1),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(common_m_radius))),

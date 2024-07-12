@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flash/flash_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -63,7 +64,6 @@ class MyApp extends StatelessWidget {
         // final navigatorKey = child.key as GlobalKey<NavigatorState>;
         child = Toast(
           navigatorKey: navigatorKey,
-          alignment: Alignment(0, 0.8),
           child: child,
         );
         return child;

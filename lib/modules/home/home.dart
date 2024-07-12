@@ -230,6 +230,36 @@ class Home extends GetView<HomeController> {
                                       mainAxisCellCount: 2,
                                       child: IceTile(index: 23, title: '황량한 해안', mapInfo: AppData.mapData['desolation_point'], onSelect: onMapSelected),
                                     ),
+                                    StaggeredGridTile.count(
+                                      crossAxisCellCount: 2,
+                                      mainAxisCellCount: 1,
+                                      child: IceTile(index: 24, title: '파 레인지 분기점', mapInfo: AppData.mapData['far_range_branch'], onSelect: onMapSelected),
+                                    ),
+                                    StaggeredGridTile.count(
+                                      crossAxisCellCount: 7,
+                                      mainAxisCellCount: 1,
+                                      child: IceTile(index: 1, color: Colors.transparent),
+                                    ),
+                                    StaggeredGridTile.count(
+                                      crossAxisCellCount: 2,
+                                      mainAxisCellCount: 2,
+                                      child: IceTile(index: 25, title: '여행자의 교차로', mapInfo: AppData.mapData['transfer_pass'], onSelect: onMapSelected),
+                                    ),
+                                    StaggeredGridTile.count(
+                                      crossAxisCellCount: 7,
+                                      mainAxisCellCount: 2,
+                                      child: IceTile(index: 1, color: Colors.transparent),
+                                    ),
+                                    StaggeredGridTile.count(
+                                      crossAxisCellCount: 2,
+                                      mainAxisCellCount: 2,
+                                      child: IceTile(index: 26, title: '버려진 활주로', mapInfo: AppData.mapData['forsaken_airfield'], onSelect: onMapSelected),
+                                    ),
+                                    StaggeredGridTile.count(
+                                      crossAxisCellCount: 2,
+                                      mainAxisCellCount: 2,
+                                      child: IceTile(index: 27, title: '오염 지역', mapInfo: AppData.mapData['zone_of_contamination'], onSelect: onMapSelected),
+                                    ),
                                   ],
                                 )
                               )

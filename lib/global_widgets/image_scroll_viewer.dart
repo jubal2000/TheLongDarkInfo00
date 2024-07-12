@@ -1,10 +1,7 @@
 import 'dart:async';
 
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:helpers/helpers/widgets/align.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 import '../core/app_data.dart';
 import '../core/dialogs.dart';
@@ -239,11 +236,11 @@ class ImageScrollViewerState extends State<ImageScrollViewer> {
                 ),
               ],
             ),
-            if (widget.showPage && _pageMax > 1)
-              BottomCenterAlign(
-                heightFactor: 13.7,
-                // child: PageDotWidget(widget.currentPage, _pageMax),
-              )
+            // if (widget.showPage && _pageMax > 1)
+            //   Alignment(
+            //     heightFactor: 13.7,
+            //     // child: PageDotWidget(widget.currentPage, _pageMax),
+            //   )
             // Positioned(
             //   right: 10,
             //   bottom: 15,

@@ -85,7 +85,10 @@ class Intro extends GetView<IntroController> {
                   }
                 );
               } else {
-                return CircularProgressIndicator();
+                return Container(
+                  alignment: Alignment.center,
+                  child: CircularProgressIndicator(),
+                );
               }
             }
           )

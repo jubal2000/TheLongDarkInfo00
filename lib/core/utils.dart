@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:helpers/helpers.dart';
 import 'package:the_long_dark_info/core/style.dart';
 
 import 'common_colors.dart';
@@ -732,7 +731,8 @@ class IceTile extends StatelessWidget {
           children: [
             if (color != Colors.transparent && mapInfo != null)...[
               showImageFit('assets/ui/main/${mapInfo!['id']}.png'),
-              BottomCenterAlign(
+              Align(
+                alignment: Alignment.bottomCenter,
                 child: Container(
                   height: 6,
                   color: borderColor.withOpacity(0.6),

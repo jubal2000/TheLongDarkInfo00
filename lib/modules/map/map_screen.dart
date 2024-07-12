@@ -1,12 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fab_circular_menu/fab_circular_menu.dart';
+import 'package:fab_circular_menu_plus/fab_circular_menu_plus.dart';
 // import 'package:gesture_zoom_box/gesture_zoom_box.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:helpers/helpers/widgets/align.dart';
 import 'package:the_long_dark_info/service/api_service.dart';
 import 'package:the_long_dark_info/service/firebase_service.dart';
-import 'package:tphoto_view/photo_view.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
@@ -30,21 +28,22 @@ class MapScreen extends GetView<MapScreenController> {
     return StatefulBuilder(
       builder: (context, setState) {
         return WillPopScope(
-            onWillPop: () async {
-          if (controller.targetList.length < 2) {
-            Get.back();
-          } else {
-            setState(() {
-              controller.removeTargetInfoLast();
-            });
-          }
-          return false;
+          onWillPop: () async {
+            if (controller.targetList.length < 2) {
+              Get.back();
+            } else {
+              setState(() {
+                controller.removeTargetInfoLast();
+              });
+            }
+            return false;
         },
         child: SafeArea(
           top: false,
           child: Scaffold(
             appBar: AppBar(
-              title: Text(STR(controller.targetInfo[Get.locale.toString() == 'ko_KR' ? 'title_kr' : 'title'])),
+              title: Text(STR(controller.targetInfo[
+                Get.locale.toString() == 'ko_KR' ? 'title_kr' : 'title'])),
               titleSpacing: 0,
               toolbarHeight: top_height,
               automaticallyImplyLeading: false,
@@ -61,17 +60,14 @@ class MapScreen extends GetView<MapScreenController> {
                 child: Icon(Icons.arrow_back, size: 24),
               ),
               actions: [
-                InkWell(
-                  onTap: () {
-                    Get.back();
-                  },
-                  child: Icon(Icons.home, size: 24),
-                ),
-                if (!AppData.isDevMode)...[
-                  SizedBox(width: 10),
+                if (!AppData.isDevMode && controller.hasMementoData)...[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      Text(
+                          AppData.isMementoShow ? 'Mn ON'.tr : 'Mn OFF'.tr,
+                          style: itemDescStyle),
+                      SizedBox(width: 5),
                       Switch(
                           value: AppData.isMementoShow,
                           onChanged: (status) {
@@ -80,8 +76,6 @@ class MapScreen extends GetView<MapScreenController> {
                             });
                           }
                       ),
-                      Text(AppData.isMementoShow ? 'Mn ON'.tr : 'Mn OFF'.tr, style: itemDescStyle),
-                      SizedBox(width: 15),
                     ]
                   ),
                 ],
@@ -90,6 +84,8 @@ class MapScreen extends GetView<MapScreenController> {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        Text(AppData.isLinkEditMode ? 'Link ON' : 'Link OFF',
+                          style: itemDescStyle),
                         Switch(
                             value: AppData.isLinkEditMode,
                             onChanged: (status) {
@@ -100,7 +96,6 @@ class MapScreen extends GetView<MapScreenController> {
                               });
                             }
                         ),
-                        Text(AppData.isLinkEditMode ? 'Link ON' : 'Link OFF', style: itemDescStyle),
                         SizedBox(width: 15),
                       ]
                   ),
@@ -117,22 +112,31 @@ class MapScreen extends GetView<MapScreenController> {
                   ],
                   SizedBox(width: 10),
                   Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Switch(
-                            value: AppData.isMemEditMode,
-                            onChanged: (status) {
-                              setState(() {
-                                AppData.isMemEditMode = status;
-                                AppData.isLinkEditMode = false;
-                              });
-                            }
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                          AppData.isMemEditMode ? 'Mem ON' : 'Mem OFF',
+                          style: itemDescStyle),
+                      Switch(
+                          value: AppData.isMemEditMode,
+                          onChanged: (status) {
+                            setState(() {
+                              AppData.isMemEditMode = status;
+                              AppData.isLinkEditMode = false;
+                            });
+                          }
                         ),
-                        Text(AppData.isMemEditMode ? 'Mem ON' : 'Mem OFF', style: itemDescStyle),
                         SizedBox(width: 15),
                       ]
+                    ),
+                  ],
+                  InkWell(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Icon(Icons.home, size: 24),
                   ),
-                  ]
+                  SizedBox(width: 20),
                 ],
               ),
               body: Container(
@@ -222,7 +226,8 @@ class MapScreen extends GetView<MapScreenController> {
                     ),
                   ),
                   if (AppData.isLinkEditMode && controller.linkEditStep == 2)...[
-                    BottomCenterAlign(
+                    Align(
+                      alignment: Alignment.bottomCenter,
                       child: Container(
                         padding: EdgeInsets.fromLTRB(20, 0, 100, 20),
                         child: Row(
@@ -262,7 +267,8 @@ class MapScreen extends GetView<MapScreenController> {
                     )
                   ],
                     if (AppData.isMemEditMode)...[
-                      BottomCenterAlign(
+                      Align(
+                        alignment: Alignment.bottomCenter,
                         child: Container(
                           padding: EdgeInsets.fromLTRB(20, 0, 100, 20),
                           child: Row(
@@ -300,7 +306,7 @@ class MapScreen extends GetView<MapScreenController> {
                 ]
               )
             ),
-            floatingActionButton: controller.isPinNotEmpty() ? FabCircularMenu(
+            floatingActionButton: controller.isPinNotEmpty() ? FabCircularMenuPlus(
               fabOpenIcon: Icon(Icons.menu, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
               fabCloseIcon: Icon(Icons.close, size: controller.iconSize, color: Theme.of(context).colorScheme.inversePrimary),
               fabMargin: EdgeInsets.all(15),

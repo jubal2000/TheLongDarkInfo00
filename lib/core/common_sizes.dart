@@ -43,3 +43,4 @@ const double item_desc_font_size = 14.0;
 const double main_menu_font_size = 13.0;
 const double pin_title_font_size = 2.5;
 const double pin_edit_title_font_size = 5;
+const double link_title_font_size = 10.0;

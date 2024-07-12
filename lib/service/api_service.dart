@@ -47,10 +47,11 @@ class ApiService extends GetxService {
       AppData.localMapData ??= List<String>.from(mapData);
     }
     LOG('--> getMapDataAll : $serverDataVer / ${AppData.localDataVer} - ${AppData.localMapData}');
-    if (AppData.localMapData == null || AppData.localDataVer != serverDataVer) {
+    if (AppData.isDevMode ||
+        AppData.localMapData == null || AppData.localDataVer != serverDataVer) {
       await getMapServerDataAll();
       StorageManager.saveData('dataVersion', serverDataVer);
-    } else {
+    } else if (AppData.localMapData != null && AppData.localMapData!.length >= 5) {
       LOG('--> AppData.localMapData : ${AppData.localMapData!.length}');
       AppData.mapData       = JSON.from(json.decode(AppData.localMapData![0]));
       AppData.mapLinkData   = JSON.from(json.decode(AppData.localMapData![1]));
@@ -183,7 +184,7 @@ class ApiService extends GetxService {
     try {
       var collectionRef = firebase.firestore!.collection(LinkCollection);
       var querySnapshot = await collectionRef
-          .where('status', isEqualTo: 1)
+          .where('status', isGreaterThan: 0)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
