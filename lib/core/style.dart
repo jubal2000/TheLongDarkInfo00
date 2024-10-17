@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import '../core/common_colors.dart';
 import '../core/common_sizes.dart';
+import 'app_data.dart';
 
 TextStyle textFieldTextStyle = TextStyle(color: Colors.grey[800]);
 TextStyle tapMenuTitleTextStyle = TextStyle(
@@ -48,8 +49,11 @@ TextStyle pinEditTitleStyle = TextStyle(
     fontSize: pin_edit_title_font_size, color: Colors.white, fontWeight: FontWeight.w600, height: 1.1);
 TextStyle linkTitleStyle = TextStyle(
     fontSize: link_title_font_size, color: Colors.red, fontWeight: FontWeight.w600, height: 1.1,
-    shadows: outlinedText(strokeWidth: 0.2, strokeColor: Colors.black54)
+    shadows: outlinedText(strokeWidth: 0.2, strokeColor: Colors.white)
 );
+
+TextStyle titleStyle   = TextStyle(fontSize: AppData.isPad ? 18 : 11, color: NAVY, fontWeight: FontWeight.w700, shadows: outlinedText(strokeWidth: 0.4, strokeColor: Colors.white), height: 1.2);
+TextStyle titleExStyle = TextStyle(fontSize: AppData.isPad ? 14 : 6, color: Colors.blueGrey, fontWeight: FontWeight.w700, shadows: outlinedText(strokeWidth: 0.4, strokeColor: Colors.white), height: 1.2);
 
 /// Outlines a text using shadows.
 List<Shadow> outlinedText({double strokeWidth = 1, Color strokeColor = Colors.black, int precision = 4}) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../core/app_data.dart';
 import '../core/common_colors.dart';
 import '../core/common_sizes.dart';
 import '../core/style.dart';
@@ -16,7 +17,7 @@ Widget mainListItem(JSON itemInfo, [Function()? onSelect]) {
         if (onSelect != null) onSelect();
       },
       child: Container(
-        height: item_height,
+        height: item_height + (AppData.isPad ? 20 : 0),
         padding: EdgeInsets.fromLTRB(15, 3, 8, 3),
         margin: EdgeInsets.symmetric(vertical: 2),
         decoration: BoxDecoration(

@@ -489,6 +489,8 @@ class MapScreenController extends GetxController {
   }
 
   showLinkListMark(item, Function()? onSelected, [bool isAddMode = false, bool isLinkEditMode = false]) {
+    var bgColor = isAddMode ? Colors.green.withOpacity(0.75) :
+      (isLinkEditMode || INT(item['status']) == 2) ? Colors.black45 : Colors.black12;
     return Positioned(
       top: DBL(item['sy']) * Get.size.width / ORG_SCREEN_WITH,
       left: DBL(item['sx']) * Get.size.width / ORG_SCREEN_WITH,
@@ -507,7 +509,7 @@ class MapScreenController extends GetxController {
           child: Container(
             width: (DBL(item['ex']) - DBL(item['sx'])) * Get.size.width / ORG_SCREEN_WITH,
             height: (DBL(item['ey']) - DBL(item['sy'])) * Get.size.width / ORG_SCREEN_WITH,
-            color: isAddMode ? Colors.green.withOpacity(0.75) : isLinkEditMode ? Colors.black45 : Colors.black12,
+            color: bgColor,
             child: Center(
               child: INT(item['status']) == 2 ?
               Text(STR(item['linkTitle_kr']), style: linkTitleStyle, textAlign: TextAlign.center) :

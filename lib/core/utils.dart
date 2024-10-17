@@ -700,7 +700,7 @@ class IceTile extends StatelessWidget {
     this.title,
     this.mapInfo,
     this.extent,
-    this.color = Colors.white,
+    this.color,
     this.borderColor = NAVY,
     this.bottomSpace,
     this.onSelect,
@@ -709,14 +709,11 @@ class IceTile extends StatelessWidget {
   final int index;
   final double? extent;
   final double? bottomSpace;
-  final Color color;
+  final Color?  color;
   final Color borderColor;
   final String? title;
   final JSON? mapInfo;
   final Function(JSON)? onSelect;
-
-  final TextStyle titleStyle   = TextStyle(fontSize: 12, color: NAVY, fontWeight: FontWeight.w700, shadows: outlinedText(strokeWidth: 0.4, strokeColor: Colors.white));
-  final TextStyle titleExStyle = TextStyle(fontSize: 8, color: Colors.blueGrey, fontWeight: FontWeight.w700, shadows: outlinedText(strokeWidth: 0.4, strokeColor: Colors.white));
 
   @override
   Widget build(BuildContext context) {
@@ -726,7 +723,7 @@ class IceTile extends StatelessWidget {
       },
       child: Container(
         height: extent,
-        color: color,
+        color: color ?? Colors.blueAccent,
         child: Stack(
           children: [
             if (color != Colors.transparent && mapInfo != null)...[

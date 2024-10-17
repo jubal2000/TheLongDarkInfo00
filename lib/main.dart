@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:the_long_dark_info/modules/home/home_controller.dart';
 import 'package:the_long_dark_info/modules/map/map_screen.dart';
@@ -16,6 +17,7 @@ import 'package:flash/flash.dart';
 import 'package:the_long_dark_info/service/local_service.dart';
 
 import './routes.dart';
+import 'core/app_data.dart';
 import 'core/themes.dart';
 import 'core/utils.dart';
 import 'core/words.dart';
@@ -30,6 +32,7 @@ void main() async {
   await Get.putAsync(() => LocalService().init());
 
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize(); //광고 초기화
 
   //세로모드로 고정
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -42,7 +45,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LOG('--> Get.locale : ${Get.locale.toString()}');
+    var shortestSide = MediaQuery.of(context).size.shortestSide;
+    AppData.isPad = shortestSide >= 600;
+    LOG('--> Get.locale : ${Get.locale.toString()} / ${AppData.isPad}');
+
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       translations: Words(), // 번역들

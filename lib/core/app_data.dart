@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:the_long_dark_info/core/utils.dart';
 
-const APP_VERSION = '0.0.2';
+const APP_VERSION = '1.0.0';
 const SCROLL_SPEED = 250;
 const ORG_SCREEN_WITH = 411;
 
+const IS_DEV_MODE = true;
+
 class AppData {
+  factory AppData() {
+    return _singleton;
+  }
   static final AppData _singleton = AppData._internal();
   AppData._internal();
 
@@ -26,6 +31,8 @@ class AppData {
 
   static int? localDataVer;
   static List<String>? localMapData;
+
+  static bool isPad = false;
 }
 
 const GameIcons = [

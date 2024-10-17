@@ -5,6 +5,7 @@ import 'package:the_long_dark_info/service/firebase_service.dart';
 
 import '../../core/app_data.dart';
 import '../../core/common_sizes.dart';
+import '../../core/style.dart';
 import '../../core/utils.dart';
 import '../../routes.dart';
 import 'intro_controller.dart';
@@ -69,6 +70,7 @@ class Intro extends GetView<IntroController> {
                                     },
                                     child: Text(
                                       'START'.tr,
+                                      style: itemTitleStyle,
                                     )
                                   ),
                                 )
