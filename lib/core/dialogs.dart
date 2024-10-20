@@ -71,12 +71,34 @@ Future showAlertDialog(BuildContext context,
   );
 }
 
-Future showAlertYesNoDialog(BuildContext context,
+Future showSimpleAlertYesNoDialog(
+  BuildContext context,
+  String desc,
+  {
+    TextStyle? style,
+  })
+{
+  return showAlertYesNoDialog(
+    context,
+    '',
+    desc,
+    '',
+    '취소',
+    '확인',
+    messageStyle1: style ?? dialogTitleTextStyle,
+  );
+}
+
+Future showAlertYesNoDialog(
+    BuildContext context,
     String title,
     String message1,
     String message2,
     String btnNoStr,
-    String btnYesStr)
+    String btnYesStr,
+  {
+    TextStyle? messageStyle1,
+  })
 {
   return showDialog(
     context: context,
@@ -93,7 +115,7 @@ Future showAlertYesNoDialog(BuildContext context,
                   width: MediaQuery.of(context).size.width * 0.9,
                   child: ListBody(
                       children: [
-                        Text(message1, style: dialogDescTextStyle),
+                        Text(message1, style: messageStyle1 ?? dialogDescTextStyle),
                         if (message2.isNotEmpty)...[
                           SizedBox(height: 10),
                           Text(message2, style: dialogDescTextExStyle),

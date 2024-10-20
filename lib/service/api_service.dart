@@ -219,9 +219,21 @@ class ApiService extends GetxService {
       var result = FROM_SERVER_DATA(addItem);
       return result;
     } catch (e) {
-      LOG('--> addLinkData : $e');
+      LOG('--> addLinkData error : $e');
     }
     return null;
+  }
+
+  Future<bool> removeLinkData(String itemId) async {
+    LOG('--> removeLinkData : $itemId');
+    try {
+      var dataRef = firebase.firestore!.collection(LinkCollection);
+      await dataRef.doc(itemId).delete();
+    } catch (e) {
+      LOG('--> removeLinkData error : $e');
+      return false;
+    }
+    return true;
   }
 
   // map memento data..

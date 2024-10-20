@@ -49,7 +49,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _createBannerAd(); //추가
+    // _createBannerAd(); //추가
   }
 
   @override

@@ -11,11 +11,11 @@ class AdMobService {
   static String? get bannerAdUnitId {
 
     if (Platform.isAndroid) {
-      return !IS_DEV_MODE ?
+      return !AppData.isDevMode ?
       'ca-app-pub-5103278828219477~9783249651' :
       'ca-app-pub-3940256099942544/6300978111';
     } else if (Platform.isIOS) {
-      return !IS_DEV_MODE ?
+      return !AppData.isDevMode ?
       'ca-app-pub-5103278828219477~8038051004' :
       'ca-app-pub-3940256099942544/2934735716';
     }

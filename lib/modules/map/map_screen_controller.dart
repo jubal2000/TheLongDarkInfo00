@@ -11,6 +11,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:the_long_dark_info/core/style.dart';
 import 'package:the_long_dark_info/global_widgets/card_scroll_viewer.dart';
 import 'package:the_long_dark_info/global_widgets/image_list_viewer.dart';
+import 'package:the_long_dark_info/helper/show_toast.dart';
 
 
 import '../../core/app_data.dart';
@@ -477,7 +478,17 @@ class MapScreenController extends GetxController {
     for (var item in AppData.linkData.entries) {
       // LOG('--> getLinkListWidget item : $targetId / ${item.value['targetId']}');
       if (item.value['targetId'] == targetId) {
-        result.add(showLinkListMark(item.value, onSelected, false, AppData.isLinkEditMode));
+        result.add(showLinkListMark(item.value, () async {
+          if (AppData.isLinkEditMode) {
+            var key = STR(item.value['id']);
+            var result = await removeLinkData(key);
+            ShowToast(Get.context!, result ? '삭제 완료' : '삭제 실패');
+            if (result) {
+              AppData.linkData.remove(key);
+            }
+          }
+          if (onSelected != null) onSelected();
+        }, false, AppData.isLinkEditMode));
       }
     }
     // LOG('--> getLinkListWidget result : ${result.length}');
@@ -489,15 +500,22 @@ class MapScreenController extends GetxController {
   }
 
   showLinkListMark(item, Function()? onSelected, [bool isAddMode = false, bool isLinkEditMode = false]) {
-    var bgColor = isAddMode ? Colors.green.withOpacity(0.75) :
+    var bgColor = isAddMode ? Colors.blue.withOpacity(0.75) :
       (isLinkEditMode || INT(item['status']) == 2) ? Colors.black45 : Colors.black12;
     return Positioned(
       top: DBL(item['sy']) * Get.size.width / ORG_SCREEN_WITH,
       left: DBL(item['sx']) * Get.size.width / ORG_SCREEN_WITH,
       child: PointerInterceptor(
         child: GestureDetector(
-          onTap: () {
-            if (AppData.isLinkEditMode || AppData.isMemEditMode) return;
+          onTap: () async {
+            if (isLinkEditMode) {
+              var result = await showSimpleAlertYesNoDialog(Get.context!, '삭제하시겠습니까?');
+              if (result == 1 && onSelected != null) onSelected();
+              return;
+            }
+            if (AppData.isMemEditMode) {
+              return;
+            }
             var linkId = item['linkId'];
             LOG('--> link touched : $linkId');
             var targetInfo = AppData.mapData[linkId] ?? AppData.mapLinkData[linkId] ?? AppData.mapInsideData[linkId];
@@ -510,6 +528,7 @@ class MapScreenController extends GetxController {
             width: (DBL(item['ex']) - DBL(item['sx'])) * Get.size.width / ORG_SCREEN_WITH,
             height: (DBL(item['ey']) - DBL(item['sy'])) * Get.size.width / ORG_SCREEN_WITH,
             color: bgColor,
+            alignment: Alignment.center,
             child: Center(
               child: INT(item['status']) == 2 ?
               Text(STR(item['linkTitle_kr']), style: linkTitleStyle, textAlign: TextAlign.center) :
@@ -605,6 +624,10 @@ class MapScreenController extends GetxController {
         onUpdate();
       }
     });
+  }
+
+  removeLinkData(itemId) async {
+    return await api.removeLinkData(itemId);
   }
 
   showLinkEditInfo(context, onUpdate) {
